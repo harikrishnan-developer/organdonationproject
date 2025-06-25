@@ -1,7 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.10;
 
-contract DonorContract {
+import "@openzeppelin/contracts/access/AccessControl.sol";
+
+contract DonorContract is AccessControl {
+    bytes32 public constant VERIFIER_ROLE = keccak256("VERIFIER_ROLE");
 
     struct pledged
     {
@@ -25,6 +28,7 @@ contract DonorContract {
         string[] organ;
         uint weight;
         uint height;
+        bool verified;
     }
 
     struct patient
@@ -37,6 +41,7 @@ contract DonorContract {
         string[] organ;
         uint weight;
         uint height;
+        bool verified;
     }
     mapping ( string =>pledged ) pledgedMap;
     mapping ( string =>donor ) donorMap;
@@ -45,6 +50,11 @@ contract DonorContract {
     string[] PledgedArray;
     string[] DonorsArray;
     string[] PatientsArray;
+
+    constructor() {
+        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _setupRole(VERIFIER_ROLE, msg.sender);
+    }
 
     function setPledge(string memory _fullname, uint _age, string memory _gender, string memory _medical_id,
                        string memory _blood_type, string[] memory _organ, uint _weight, uint _height)
@@ -76,7 +86,7 @@ contract DonorContract {
         donorMap[_medical_id].organ = _organ;
         donorMap[_medical_id].weight = _weight;
         donorMap[_medical_id].height = _height;
-
+        donorMap[_medical_id].verified = false;
         DonorsArray.push(_medical_id);
     }
 
@@ -93,7 +103,7 @@ contract DonorContract {
         patientMap[_medical_id].organ = _organ;
         patientMap[_medical_id].weight = _weight;
         patientMap[_medical_id].height = _height;
-
+        patientMap[_medical_id].verified = false;
         PatientsArray.push(_medical_id);
     }
 
@@ -196,4 +206,17 @@ contract DonorContract {
         return PatientsArray.length;
     }
 
+    // Verifier functions
+    function verifyDonor(string memory _medical_id) public onlyRole(VERIFIER_ROLE) {
+        donorMap[_medical_id].verified = true;
+    }
+    function verifyPatient(string memory _medical_id) public onlyRole(VERIFIER_ROLE) {
+        patientMap[_medical_id].verified = true;
+    }
+    function isDonorVerified(string memory _medical_id) public view returns (bool) {
+        return donorMap[_medical_id].verified;
+    }
+    function isPatientVerified(string memory _medical_id) public view returns (bool) {
+        return patientMap[_medical_id].verified;
+    }
 }

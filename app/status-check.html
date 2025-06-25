@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Transplant Matching - Status Check</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .status-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .status-success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .status-error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .status-warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .emoji {
+            font-size: 1.5em;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="status-container">
+        <h1>🤖 AI Transplant Matching - Status Check</h1>
+        <p>This page verifies that all components of the AI-powered transplant matching system are working correctly.</p>
+        
+        <button class="test-button" onclick="runAllTests()">Run All Tests</button>
+        <button class="test-button" onclick="testAIFiles()">Test AI Files</button>
+        <button class="test-button" onclick="testDataLoading()">Test Data Loading</button>
+        <button class="test-button" onclick="testPrediction()">Test Prediction</button>
+        
+        <div id="testResults"></div>
+    </div>
+
+    <div class="status-container">
+        <h2>📋 Quick Links</h2>
+        <ul>
+            <li><a href="transplant-matching.html" target="_blank">🤖 AI Transplant Matching Page</a></li>
+            <li><a href="test-ai.html" target="_blank">🧪 AI Test Page</a></li>
+            <li><a href="homepage.html" target="_blank">🏠 Homepage</a></li>
+        </ul>
+    </div>
+
+    <script src="ai-matching.js"></script>
+    <script>
+        function logResult(message, type = 'success') {
+            const resultsDiv = document.getElementById('testResults');
+            const div = document.createElement('div');
+            div.className = `status-${type}`;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}:</strong> ${message}`;
+            resultsDiv.appendChild(div);
+        }
+
+        function testAIFiles() {
+            logResult('Testing AI file availability...');
+            
+            // Test if AI matcher class is available
+            if (typeof AITransplantMatcher !== 'undefined') {
+                logResult('✅ AITransplantMatcher class loaded successfully');
+            } else {
+                logResult('❌ AITransplantMatcher class not found', 'error');
+            }
+
+            // Test if main.js functions are available
+            if (typeof App !== 'undefined') {
+                logResult('✅ App object loaded successfully');
+                if (typeof App.enhancedTransplantMatch === 'function') {
+                    logResult('✅ enhancedTransplantMatch function available');
+                } else {
+                    logResult('❌ enhancedTransplantMatch function not found', 'error');
+                }
+            } else {
+                logResult('❌ App object not found', 'error');
+            }
+        }
+
+        async function testDataLoading() {
+            logResult('Testing data loading...');
+            try {
+                const response = await fetch('./transplant_dataa.csv');
+                if (response.ok) {
+                    const text = await response.text();
+                    const lines = text.split('\n');
+                    logResult(`✅ CSV data loaded successfully! ${lines.length} lines found.`);
+                    
+                    // Check if it has the expected format
+                    if (lines[0].includes('Donor_Blood,Donor_Age,Patient_Blood,Patient_Age,Organ,Match_Score')) {
+                        logResult('✅ CSV format is correct');
+                    } else {
+                        logResult('⚠️ CSV format may be different than expected', 'warning');
+                    }
+                } else {
+                    logResult(`❌ Failed to load CSV: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                logResult(`❌ Error loading data: ${error.message}`, 'error');
+            }
+        }
+
+        async function testPrediction() {
+            logResult('Testing AI prediction...');
+            try {
+                if (typeof AITransplantMatcher === 'undefined') {
+                    logResult('❌ AITransplantMatcher not available', 'error');
+                    return;
+                }
+
+                const aiMatcher = new AITransplantMatcher();
+                logResult('✅ AI matcher created successfully');
+                
+                // Test blood compatibility
+                const compatibility = aiMatcher.calculateBloodCompatibility('O-', 'A+');
+                logResult(`✅ Blood compatibility test: O- → A+ = ${(compatibility * 100).toFixed(1)}%`);
+                
+                // Test feature encoding
+                const features = aiMatcher.encodeFeatures(
+                    { bloodType: 'O-', age: 25 },
+                    { bloodType: 'A+', age: 45 },
+                    'heart'
+                );
+                logResult(`✅ Feature encoding test completed`);
+                
+                // Test data loading and model training
+                await aiMatcher.loadTrainingData();
+                aiMatcher.trainModel();
+                logResult('✅ Model training completed');
+                
+                // Test prediction
+                const score = aiMatcher.predictMatchScore(
+                    { bloodType: 'O-', age: 25 },
+                    { bloodType: 'A+', age: 45 },
+                    'heart'
+                );
+                logResult(`✅ Prediction test: Match score = ${(score * 100).toFixed(1)}%`);
+                
+            } catch (error) {
+                logResult(`❌ Error in prediction test: ${error.message}`, 'error');
+            }
+        }
+
+        function runAllTests() {
+            document.getElementById('testResults').innerHTML = '';
+            logResult('🚀 Starting comprehensive AI system test...');
+            
+            setTimeout(() => testAIFiles(), 500);
+            setTimeout(() => testDataLoading(), 1000);
+            setTimeout(() => testPrediction(), 2000);
+        }
+
+        // Auto-run basic tests on page load
+        window.onload = function() {
+            logResult('🎯 AI Transplant Matching System Status Check');
+            logResult('Click "Run All Tests" to verify all functionality');
+        };
+    </script>
+</body>
+</html> 

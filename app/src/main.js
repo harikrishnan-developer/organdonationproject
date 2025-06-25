@@ -139,18 +139,82 @@ const App = {
     web3: null,
     contractInstance: null,
     accounts: null,
+    metamaskInstalled: false,
 
     start: async function() {
-        const { web3 } = this;
-        // Get the accounts
-        this.accounts = await web3.eth.getAccounts();
+        if (typeof window.ethereum !== 'undefined') {
+            this.metamaskInstalled = true;
+            this.web3 = new Web3(window.ethereum);
+        } else {
+            // MetaMask is not installed
+            this.web3 = new Web3("HTTP://127.0.0.1:7545");
+        }
 
-        console.log(this.accounts);
+        try {
+            // Get the accounts
+            this.accounts = await this.web3.eth.getAccounts();
+            console.log(this.accounts);
 
-        this.contractInstance = new web3.eth.Contract(
-            artifact.abi,
-            contractAddress
-        );
+            this.contractInstance = new this.web3.eth.Contract(
+                artifact.abi,
+                contractAddress
+            );
+
+            // Update UI based on connection status
+            this.updateUI();
+
+        } catch (error) {
+            console.error("Could not start the application.", error);
+        }
+    },
+
+    connect: async function() {
+        if (!this.metamaskInstalled) {
+            alert("Please install MetaMask to use this feature.");
+            return;
+        }
+        try {
+            // Request account access
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            this.accounts = accounts;
+            console.log("Connected accounts:", this.accounts);
+
+            this.contractInstance = new this.web3.eth.Contract(
+                artifact.abi,
+                contractAddress
+            );
+
+            // Update UI after connecting
+            this.updateUI();
+
+        } catch (error) {
+            console.error("User denied account access or an error occurred.", error);
+        }
+    },
+
+    updateUI: function() {
+        const connectButton = document.getElementById('connectWalletBtn');
+        const formContainer = document.getElementById('registrationForm');
+        const walletInfo = document.getElementById('walletInfo');
+        
+        if (connectButton && formContainer) {
+            if (this.accounts && this.accounts.length > 0) {
+                // Connected
+                connectButton.style.display = 'none';
+                formContainer.style.display = 'block';
+                if (walletInfo) {
+                    walletInfo.innerHTML = `Connected: ${this.accounts[0].substring(0, 6)}...${this.accounts[0].substring(38)}`;
+                    walletInfo.style.display = 'block';
+                }
+            } else {
+                // Not connected
+                connectButton.style.display = 'block';
+                formContainer.style.display = 'none';
+                if (walletInfo) {
+                    walletInfo.style.display = 'none';
+                }
+            }
+        }
     },
 
     closeAlert: async function (){
@@ -255,42 +319,84 @@ const App = {
 
     search: async function(user) {
         console.log(user);
-        const medical_id = document.getElementById("input"+user+"MedicalID").value;
-        if (medical_id.length==0) {
-            document.getElementById("search"+user+"Check").innerHTML = "Enter Medical ID";
+        // Use the new unified search input
+        const input = document.getElementById("input"+user+"Search").value.trim();
+        if (input.length === 0) {
+            document.getElementById("search"+user+"Check").innerHTML = "Enter Medical ID or Name";
             clearSearchValues(user);
+            return;
         }
 
-        else {
-            let validate = false;
-            if (user=="Donor"){
-                validate = await this.contractInstance.methods.validateDonor(medical_id).call();
-            }
-            else if (user="Patient") {
-                validate = await this.contractInstance.methods.validatePatient(medical_id).call();
-            }
-            console.log("Inside getDonor: "+validate);
+        // Try searching by Medical ID first
+        let validate = false;
+        if (user === "Donor") {
+            validate = await this.contractInstance.methods.validateDonor(input).call();
+        } else if (user === "Patient") {
+            validate = await this.contractInstance.methods.validatePatient(input).call();
+        }
 
-            if (validate) {
-                if (user=="Donor"){
-                    await this.contractInstance.methods.getDonor(medical_id).call().then(function(result){
-                        console.log(result);
-                        document.getElementById("search"+user+"Check").innerHTML = null;
-                        assignSearchValues(result, user);
-                    });
-                }
-                else if (user="Patient"){
-                    await this.contractInstance.methods.getPatient(medical_id).call().then(function(result){
-                        console.log(result);
-                        document.getElementById("search"+user+"Check").innerHTML = null;
-                        assignSearchValues(result, user);
-                    });
-                }
+        if (validate) {
+            // Found by Medical ID
+            if (user === "Donor") {
+                await this.contractInstance.methods.getDonor(input).call().then(function(result){
+                    document.getElementById("search"+user+"Check").innerHTML = null;
+                    assignSearchValues(result, user);
+                });
+            } else if (user === "Patient") {
+                await this.contractInstance.methods.getPatient(input).call().then(function(result){
+                    document.getElementById("search"+user+"Check").innerHTML = null;
+                    assignSearchValues(result, user);
+                });
             }
-            else {
-                document.getElementById("search"+user+"Check").innerHTML = "Medical ID does not exist!";
-                clearSearchValues(user);
+            return;
+        }
+
+        // If not found by Medical ID, search by name (case-insensitive)
+        let allIDs = [];
+        if (user === "Donor") {
+            allIDs = await this.contractInstance.methods.getAllDonorIDs().call();
+        } else if (user === "Patient") {
+            allIDs = await this.contractInstance.methods.getAllPatientIDs().call();
+        }
+        let matches = [];
+        for (let i = 0; i < allIDs.length; i++) {
+            let result;
+            if (user === "Donor") {
+                result = await this.contractInstance.methods.getDonor(allIDs[i]).call();
+            } else if (user === "Patient") {
+                result = await this.contractInstance.methods.getPatient(allIDs[i]).call();
             }
+            // result[0] is fullname
+            if (result[0] && result[0].toLowerCase() === input.toLowerCase()) {
+                matches.push(result);
+            }
+        }
+        if (matches.length > 0) {
+            // Show all matches as a list
+            let html = '';
+            matches.forEach((result, idx) => {
+                html += `<div class='border rounded p-2 mb-2'>` +
+                    `<strong>Match ${idx+1}</strong><br>` +
+                    `Full Name: ${result[0]}<br>` +
+                    `Age: ${result[1]}<br>` +
+                    `Gender: ${result[2]}<br>` +
+                    `Blood Type: ${result[3]}<br>` +
+                    `Organ: ${result[4]}<br>` +
+                    `Weight: ${result[5]}<br>` +
+                    `Height: ${result[6]}` +
+                    `</div>`;
+            });
+            document.getElementById("search"+user+"Check").innerHTML = null;
+            document.getElementById("get"+user+"FullName").innerHTML = html;
+            document.getElementById("get"+user+"Age").innerHTML = '';
+            document.getElementById("get"+user+"Gender").innerHTML = '';
+            document.getElementById("get"+user+"BloodType").innerHTML = '';
+            document.getElementById("get"+user+"Organ").innerHTML = '';
+            document.getElementById("get"+user+"Weight").innerHTML = '';
+            document.getElementById("get"+user+"Height").innerHTML = '';
+        } else {
+            document.getElementById("search"+user+"Check").innerHTML = "No match found!";
+            clearSearchValues(user);
         }
     },
 
@@ -504,8 +610,291 @@ const App = {
         }
         const spinner = document.querySelector(".spinner");
         spinner.style.display = "none";
-    }
+    },
 
+    enhancedTransplantMatch: async function() {
+        this.accounts = await web3.eth.getAccounts();
+        this.contractInstance = new web3.eth.Contract(
+            artifact.abi,
+            contractAddress
+        );
+
+        // Check if AI matcher is available
+        if (typeof AITransplantMatcher === 'undefined') {
+            console.error('AITransplantMatcher not loaded. Falling back to basic matching.');
+            document.getElementById("aiStatus").innerHTML = "Not Available";
+            document.getElementById("aiStatus").className = "badge badge-danger";
+            // Fall back to basic matching
+            return this.transplantMatch();
+        }
+
+        // Update status indicators
+        document.getElementById("aiStatus").innerHTML = "Training...";
+        document.getElementById("aiStatus").className = "badge badge-warning";
+
+        // Initialize AI matcher
+        const aiMatcher = new AITransplantMatcher();
+        
+        // Load and train AI model
+        await aiMatcher.loadTrainingData();
+        aiMatcher.trainModel();
+        
+        document.getElementById("aiStatus").innerHTML = "Ready";
+        document.getElementById("aiStatus").className = "badge badge-success";
+
+        // Get patient and donor data
+        const patientCount = await this.contractInstance.methods.getCountOfPatients().call();
+        const donorCount = await this.contractInstance.methods.getCountOfDonors().call();
+        const patientIDs = await this.contractInstance.methods.getAllPatientIDs().call();
+        const donorIDs = await this.contractInstance.methods.getAllDonorIDs().call();
+
+        // Update counts
+        document.getElementById("patientCount").innerHTML = patientCount;
+        document.getElementById("donorCount").innerHTML = donorCount;
+
+        // Prepare patient data
+        const patients = [];
+        for (let i = 0; i < patientCount; i++) {
+            const result = await this.contractInstance.methods.getPatient(patientIDs[i]).call();
+            const organsArr = [];
+            for (let o = 0; o < result[4].length; o++) {
+                organsArr.push(result[4][o]);
+            }
+            patients.push({
+                id: patientIDs[i],
+                name: result[0],
+                age: result[1],
+                gender: result[2],
+                bloodType: result[3],
+                organs: organsArr,
+                weight: result[5],
+                height: result[6]
+            });
+        }
+
+        // Prepare donor data
+        const donors = [];
+        for (let i = 0; i < donorCount; i++) {
+            const result = await this.contractInstance.methods.getDonor(donorIDs[i]).call();
+            const organsArr = [];
+            for (let o = 0; o < result[4].length; o++) {
+                organsArr.push(result[4][o]);
+            }
+            donors.push({
+                id: donorIDs[i],
+                name: result[0],
+                age: result[1],
+                gender: result[2],
+                bloodType: result[3],
+                organs: organsArr,
+                weight: result[5],
+                height: result[6]
+            });
+        }
+
+        // Get AI-powered recommendations
+        const recommendations = await aiMatcher.getMatchRecommendations(patients, donors);
+        
+        // Update match count
+        document.getElementById("matchCount").innerHTML = recommendations.length;
+
+        // Display matches in table
+        const table = document.getElementById("transplantTable");
+        table.innerHTML = '';
+
+        if (recommendations.length > 0) {
+            // Create table header
+            const thead = table.createTHead();
+            const headerRow = thead.insertRow();
+            const headers = [
+                "Rank", "Patient Name", "Patient Age", "Patient Blood", "Organ", 
+                "AI Score", "Basic Compatibility", "Combined Score", "Donor Name", 
+                "Donor Age", "Donor Blood", "Match Quality"
+            ];
+            
+            headers.forEach(header => {
+                const th = document.createElement("th");
+                th.textContent = header;
+                headerRow.appendChild(th);
+            });
+
+            // Create table body
+            const tbody = table.createTBody();
+            recommendations.forEach((rec, index) => {
+                const row = tbody.insertRow();
+                
+                // Determine match quality color
+                let qualityClass = '';
+                let qualityText = '';
+                if (rec.combinedScore >= 0.8) {
+                    qualityClass = 'text-success';
+                    qualityText = 'Excellent';
+                } else if (rec.combinedScore >= 0.6) {
+                    qualityClass = 'text-warning';
+                    qualityText = 'Good';
+                } else if (rec.combinedScore >= 0.4) {
+                    qualityClass = 'text-info';
+                    qualityText = 'Fair';
+                } else {
+                    qualityClass = 'text-danger';
+                    qualityText = 'Poor';
+                }
+
+                // Determine organ label/icon
+                let organLabel = rec.organ;
+                switch (rec.organ.toLowerCase()) {
+                    case 'heart':
+                        organLabel = '❤️ Heart';
+                        break;
+                    case 'liver':
+                        organLabel = 'Liver';
+                        break;
+                    case 'left lung':
+                    case 'right lung':
+                        organLabel = '🫁 ' + rec.organ.charAt(0).toUpperCase() + rec.organ.slice(1);
+                        break;
+                    case 'left kidney':
+                    case 'right kidney':
+                        organLabel = '🫘 ' + rec.organ.charAt(0).toUpperCase() + rec.organ.slice(1);
+                        break;
+                    case 'pancreas':
+                        organLabel = 'Pancreas';
+                        break;
+                    case 'intestine':
+                        organLabel = 'Intestine';
+                        break;
+                    default:
+                        organLabel = rec.organ;
+                }
+
+                row.innerHTML = `
+                    <td><strong>${index + 1}</strong></td>
+                    <td>${rec.patient.name}</td>
+                    <td>${rec.patient.age}</td>
+                    <td><span class="badge badge-secondary">${rec.patient.bloodType}</span></td>
+                    <td>${organLabel}</td>
+                    <td><span class="badge badge-info">${(rec.aiScore * 100).toFixed(1)}%</span></td>
+                    <td><span class="badge badge-secondary">${(rec.basicCompatibility * 100).toFixed(1)}%</span></td>
+                    <td><span class="badge badge-primary">${(rec.combinedScore * 100).toFixed(1)}%</span></td>
+                    <td>${rec.donor.name}</td>
+                    <td>${rec.donor.age}</td>
+                    <td><span class="badge badge-secondary">${rec.donor.bloodType}</span></td>
+                    <td><span class="${qualityClass}"><strong>${qualityText}</strong></span></td>
+                `;
+            });
+        } else {
+            table.innerHTML = '<tr><td colspan="12" class="text-center text-muted">No matches found</td></tr>';
+        }
+
+        // Generate AI insights
+        this.generateAIInsights(recommendations, patients, donors, aiMatcher);
+
+        const spinner = document.querySelector(".spinner");
+        spinner.style.display = "none";
+    },
+
+    generateAIInsights: function(recommendations, patients, donors, aiMatcher) {
+        const insightsDiv = document.getElementById("aiInsights");
+        
+        if (recommendations.length === 0) {
+            insightsDiv.innerHTML = '<p class="text-muted">No matches found. Consider adding more donors or patients.</p>';
+            return;
+        }
+
+        // Calculate statistics
+        const avgAIScore = recommendations.reduce((sum, rec) => sum + rec.aiScore, 0) / recommendations.length;
+        const avgCombinedScore = recommendations.reduce((sum, rec) => sum + rec.combinedScore, 0) / recommendations.length;
+        const excellentMatches = recommendations.filter(rec => rec.combinedScore >= 0.8).length;
+        const goodMatches = recommendations.filter(rec => rec.combinedScore >= 0.6 && rec.combinedScore < 0.8).length;
+
+        // Find most common organs
+        const organCounts = {};
+        recommendations.forEach(rec => {
+            organCounts[rec.organ] = (organCounts[rec.organ] || 0) + 1;
+        });
+        const mostCommonOrgan = Object.keys(organCounts).reduce((a, b) => organCounts[a] > organCounts[b] ? a : b);
+
+        // Find best match
+        const bestMatch = recommendations[0];
+
+        // Get training data count safely
+        const trainingDataCount = aiMatcher && aiMatcher.trainingData ? aiMatcher.trainingData.length : 'Unknown';
+
+        insightsDiv.innerHTML = `
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>📊 Match Statistics</h6>
+                    <ul class="list-unstyled">
+                        <li><strong>Total Matches:</strong> ${recommendations.length}</li>
+                        <li><strong>Average AI Score:</strong> ${(avgAIScore * 100).toFixed(1)}%</li>
+                        <li><strong>Average Combined Score:</strong> ${(avgCombinedScore * 100).toFixed(1)}%</li>
+                        <li><strong>Excellent Matches (≥80%):</strong> ${excellentMatches}</li>
+                        <li><strong>Good Matches (≥60%):</strong> ${goodMatches}</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h6>💡 Key Insights</h6>
+                    <ul class="list-unstyled">
+                        <li><strong>Most Requested Organ:</strong> ${mostCommonOrgan}</li>
+                        <li><strong>Best Match Score:</strong> ${(bestMatch.combinedScore * 100).toFixed(1)}%</li>
+                        <li><strong>Patient-Donor Ratio:</strong> ${patients.length}:${donors.length}</li>
+                        <li><strong>AI Model Confidence:</strong> High (trained on ${trainingDataCount} records)</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-12">
+                    <h6>⭐ Top Recommendation</h6>
+                    <div class="alert alert-success">
+                        <strong>${bestMatch.patient.name}</strong> (${bestMatch.patient.bloodType}) 
+                        needs a <strong>${bestMatch.organ}</strong> and matches with 
+                        <strong>${bestMatch.donor.name}</strong> (${bestMatch.donor.bloodType}) 
+                        with a <strong>${(bestMatch.combinedScore * 100).toFixed(1)}%</strong> compatibility score.
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    verifyDonor: async function(medical_id) {
+        try {
+            await this.contractInstance.methods.verifyDonor(medical_id).send({from: this.accounts[0]});
+            alert('Donor verified!');
+            this.viewDonorsWithVerify();
+        } catch (e) {
+            alert('Verification failed or not authorized.');
+        }
+    },
+
+    viewDonorsWithVerify: async function() {
+        this.accounts = await this.web3.eth.getAccounts();
+        this.contractInstance = new this.web3.eth.Contract(
+            artifact.abi,
+            contractAddress
+        );
+        const DonorCount = await this.contractInstance.methods.getCountOfDonors().call();
+        const DonorIDs = await this.contractInstance.methods.getAllDonorIDs().call();
+        let table = document.getElementById('donorTable');
+        table.innerHTML = '';
+        // Table header
+        let header = `<tr><th>#</th><th>Full Name</th><th>Age</th><th>Gender</th><th>Medical ID</th><th>Blood Type</th><th>Organ(s)</th><th>Weight(kg)</th><th>Height(cm)</th><th>Status</th><th>Action</th></tr>`;
+        table.innerHTML += header;
+        // Check if user is verifier
+        let isVerifier = false;
+        try {
+            isVerifier = await this.contractInstance.methods.hasRole(this.contractInstance.methods.VERIFIER_ROLE().call(), this.accounts[0]);
+        } catch (e) {}
+        for (let i=0; i<DonorCount; i++) {
+            let result = await this.contractInstance.methods.getDonor(DonorIDs[i]).call();
+            let verified = await this.contractInstance.methods.isDonorVerified(DonorIDs[i]).call();
+            let status = verified ? `<span class='badge badge-success'>Verified</span>` : `<span class='badge badge-warning'>Not Verified</span>`;
+            let action = '';
+            if (!verified && isVerifier) {
+                action = `<button class='btn btn-sm btn-success' onclick='App.verifyDonor("${DonorIDs[i]}")'>Verify</button>`;
+            }
+            table.innerHTML += `<tr><td>${i+1}</td><td>${result[0]}</td><td>${result[1]}</td><td>${result[2]}</td><td>${DonorIDs[i]}</td><td>${result[3]}</td><td>${result[4]}</td><td>${result[5]}</td><td>${result[6]}</td><td>${status}</td><td>${action}</td></tr>`;
+        }
+    }
 }
 
 window.App = App;

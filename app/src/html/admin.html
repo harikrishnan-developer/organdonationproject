@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Organ Donation Platform</title>
+    <link rel="stylesheet" href="../css/bootstrap.css">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/fontawesome-all.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <a href="index.html"><img class="nav-logo" src="../images/organ-donation-platform-logo-1.svg" alt="Organ Donation Platform"></a>
+                <span class="ml-3 font-weight-bold">Admin Dashboard</span>
+            </nav>
+        </div>
+    </header>
+    <main class="container py-5">
+        <div class="text-center mb-4">
+            <button id="connectWalletBtn" class="btn btn-primary btn-lg" onclick="App.connect()">Connect with MetaMask</button>
+            <div id="walletInfo" class="alert alert-success mt-3" style="display:none;"></div>
+        </div>
+        <div id="adminContent" style="display:none;">
+            <h2 class="mb-4">Verify Donors</h2>
+            <div class="table-responsive">
+                <table id="donorTable" class="table table-bordered table-striped"></table>
+            </div>
+        </div>
+        <div id="notAuthorized" class="alert alert-danger text-center" style="display:none;">
+            You are not authorized as a verifier.
+        </div>
+    </main>
+    <script src="../main.js"></script>
+    <script>
+        window.addEventListener('load', async function() {
+            await App.start();
+            // Check if user is verifier
+            let isVerifier = false;
+            try {
+                const contract = App.contractInstance;
+                const role = await contract.methods.VERIFIER_ROLE().call();
+                isVerifier = await contract.methods.hasRole(role, App.accounts[0]).call();
+            } catch (e) {}
+            document.getElementById('connectWalletBtn').style.display = (App.accounts && App.accounts.length > 0) ? 'none' : 'block';
+            document.getElementById('walletInfo').style.display = (App.accounts && App.accounts.length > 0) ? 'block' : 'none';
+            if (App.accounts && App.accounts.length > 0) {
+                document.getElementById('walletInfo').innerHTML = `Connected: ${App.accounts[0].substring(0, 6)}...${App.accounts[0].substring(38)}`;
+            }
+            if (isVerifier) {
+                document.getElementById('adminContent').style.display = 'block';
+                document.getElementById('notAuthorized').style.display = 'none';
+                App.viewDonorsWithVerify();
+            } else {
+                document.getElementById('adminContent').style.display = 'none';
+                document.getElementById('notAuthorized').style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html> 

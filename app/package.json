@@ -4,7 +4,7 @@
   "description": "A platform connecting organ donor and acceptor via ethereum blockchain",
   "main": "src/index.js",
   "scripts": {
-    "build": "webpack--openssl-legacy-provider build",
+    "build": "webpack --mode production",
     "dev": "webpack-dev-server"
   },
   "author": "Rahul Sabinkar, Bongurala Sai Manikanta Teja, Boini Sai Kumar, Gummadi Sai Kumar",

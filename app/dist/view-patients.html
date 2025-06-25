@@ -1,7 +1,6 @@
 <!DOCTYPE html>
-  <html lang="en">
+<html lang="en">
     <head>
-        
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,7 +13,7 @@
 
         <link rel="icon" href="images/organ-donation-logo-new.svg">
 
-        <title>Donors Database</title>    
+        <title>Patients Database</title>
     </head>
 
     <body>
@@ -49,9 +48,9 @@
             <div class="container">
                 <div class="row center-box">
                     <div class="col-md-12">
-                        <h3>Details of Registered Donors</h3>
+                        <h3>Details of Registered Patients</h3>
                         <div class="table-responsive">
-                            <table id="donorTable">
+                            <table>
                                 <!-- here goes table generated data! -->
                             </table>
                         </div>
@@ -63,11 +62,8 @@
         
     </body>
 
-        <script src="../main.js"></script>
-        <script>
-            window.onload = async function() {
-                await App.start();
-                App.viewDonorsWithVerify();
-            };
-        </script>
+    <script src="../main.js"></script>
+    <script>
+        window.onload = App.viewPatients();
+    </script>
 </html>
