@@ -26,7 +26,7 @@
                 <div class="row">
                     <div class="col-md-12">
                         <nav>
-                            <a href="index.html"><img class="nav-logo" src="./images/organ-donation-platform-logo-1.svg" alt="Organ Donation Platform"></a>
+                            <a href="index.html"><img class="nav-logo" src="./images/Screenshot__14_-removebg-preview.png" alt="Organ Donation Platform"></a>
                             <ul class="navbar-nav">
                                 <li>
                                     <a class="nav-link" href="homepage.html"><i class="fas fa-home"></i> Homepage</a>
@@ -40,119 +40,119 @@
         <!-- End Navigation Bar -->
 
         <!-- Main Dashboard Content -->
-        <main class="container py-5">
-            <div class="row">
-                <!-- Donor Actions -->
-                <div class="col-lg-6 mb-4">
-                    <div class="card dashboard-card">
-                        <div class="card-header">
-                            <h3><i class="fas fa-user-plus"></i> Donor Actions</h3>
+            <main class="container py-5">    
+                <div class="row">
+                    <!-- Donor Actions -->
+                    <div class="col-lg-6 mb-4">
+                        <div class="card dashboard-card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-user-plus"></i> Donor Actions</h3>
+                            </div>
+                            <div class="card-body">
+                                <a href="donor-registration.html" class="btn btn-primary btn-block mb-2">Register Donor</a>
+                                <a href="view-donors.html" class="btn btn-secondary btn-block mb-2">View Donors</a>
+                            </div>
                         </div>
-                        <div class="card-body">
-                            <a href="donor-registration.html" class="btn btn-primary btn-block mb-2">Register Donor</a>
-                            <a href="view-donors.html" class="btn btn-secondary btn-block mb-2">View Donors</a>
+                    </div>
+
+                    <!-- Patient Actions -->
+                    <div class="col-lg-6 mb-4">
+                        <div class="card dashboard-card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-procedures"></i> Patient Actions</h3>
+                            </div>
+                            <div class="card-body">
+                                <a href="patient-registration.html" class="btn btn-primary btn-block mb-2">Register Patient</a>
+                                <a href="view-patients.html" class="btn btn-secondary btn-block mb-2">View Patients</a>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Patient Actions -->
-                <div class="col-lg-6 mb-4">
-                    <div class="card dashboard-card">
-                        <div class="card-header">
-                            <h3><i class="fas fa-procedures"></i> Patient Actions</h3>
-                        </div>
-                        <div class="card-body">
-                            <a href="patient-registration.html" class="btn btn-primary btn-block mb-2">Register Patient</a>
-                            <a href="view-patients.html" class="btn btn-secondary btn-block mb-2">View Patients</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row">
-                <!-- Pledge Actions -->
-                <div class="col-12 mb-4">
-                    <div class="card dashboard-card">
-                        <div class="card-header">
-                            <h3><i class="fas fa-hand-holding-heart"></i> Pledge Actions</h3>
-                        </div>
-                        <div class="card-body text-center">
+                <div class="row">
+                    <!-- Pledge Actions -->
+                    <div class="col-12 mb-4">
+                        <div class="card dashboard-card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-hand-holding-heart"></i> Pledge Actions</h3>
+                            </div>
+                            <div class="card-body text-center">
                             <a href="verify-pledges.html" class="btn btn-info mx-2">Verify Pledges</a>
                             <a href="view-pledges.html" class="btn btn-info mx-2">View Pledges</a>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="row">
-                <!-- Transplant Match -->
-                <div class="col-12 mb-4">
-                    <div class="card dashboard-card text-center">
-                        <div class="card-body">
-                            <a href="transplant-matching.html" class="btn btn-success btn-lg btn-block"><i class="fas fa-heartbeat"></i> AI Transplant Match</a>
+                <div class="row">
+                    <!-- Transplant Match -->
+                    <div class="col-12 mb-4">
+                        <div class="card dashboard-card text-center">
+                            <div class="card-body">
+                                <a href="transplant-matching.html" class="btn btn-success btn-lg btn-block"><i class="fas fa-heartbeat"></i> AI Transplant Match</a>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="row">
-                <!-- Search Donor -->
-                <div class="col-lg-6 mb-4">
-                    <div class="card dashboard-card">
-                        <div class="card-header">
-                            <h3><i class="fas fa-search"></i> Search Donor</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="form-group">
+                <div class="row">
+                    <!-- Search Donor -->
+                    <div class="col-lg-6 mb-4">
+                        <div class="card dashboard-card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-search"></i> Search Donor</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
                                 <input type="text" id="inputDonorSearch" class="form-control" placeholder="Enter Donor Medical ID or Name">
-                            </div>
-                            <button type="submit" class="btn btn-primary btn-block" onclick="App.search('Donor')">Search</button>
-                            <div class="details mt-3" id="donor-details">
-                                <p id="getDonorFullName"></p>
-                                <p id="getDonorAge"></p>
-                                <p id="getDonorGender"></p>
-                                <p id="getDonorBloodType"></p>
-                                <p id="getDonorOrgan"></p>
-                                <p id="getDonorWeight"></p>
-                                <p id="getDonorHeight"></p>
-                                <p id="searchDonorCheck" class="text-center"></p>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-block" onclick="App.search('Donor')">Search</button>
+                                <div class="details mt-3" id="donor-details">
+                                    <p id="getDonorFullName"></p>
+                                    <p id="getDonorAge"></p>
+                                    <p id="getDonorGender"></p>
+                                    <p id="getDonorBloodType"></p>
+                                    <p id="getDonorOrgan"></p>
+                                    <p id="getDonorWeight"></p>
+                                    <p id="getDonorHeight"></p>
+                                    <p id="searchDonorCheck" class="text-center"></p>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Search Patient -->
-                <div class="col-lg-6 mb-4">
-                    <div class="card dashboard-card">
-                        <div class="card-header">
-                            <h3><i class="fas fa-search"></i> Search Patient</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="form-group">
-                                <input type="text" id="inputPatientSearch" class="form-control" placeholder="Enter Patient Medical ID or Name">
+                    <!-- Search Patient -->
+                    <div class="col-lg-6 mb-4">
+                        <div class="card dashboard-card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-search"></i> Search Patient</h3>
                             </div>
-                            <button type="submit" class="btn btn-primary btn-block" onclick="App.search('Patient')">Search</button>
-                            <div class="details mt-3" id="patient-details">
-                                <p id="getPatientFullName"></p>
-                                <p id="getPatientAge"></p>
-                                <p id="getPatientGender"></p>
-                                <p id="getPatientBloodType"></p>
-                                <p id="getPatientOrgan"></p>
-                                <p id="getPatientWeight"></p>
-                                <p id="getPatientHeight"></p>
-                                <p id="searchPatientCheck" class="text-center"></p>
+                            <div class="card-body">
+                                <div class="form-group">
+                                <input type="text" id="inputPatientSearch" class="form-control" placeholder="Enter Patient Medical ID or Name">
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-block" onclick="App.search('Patient')">Search</button>
+                                <div class="details mt-3" id="patient-details">
+                                    <p id="getPatientFullName"></p>
+                                    <p id="getPatientAge"></p>
+                                    <p id="getPatientGender"></p>
+                                    <p id="getPatientBloodType"></p>
+                                    <p id="getPatientOrgan"></p>
+                                    <p id="getPatientWeight"></p>
+                                    <p id="getPatientHeight"></p>
+                                    <p id="searchPatientCheck" class="text-center"></p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </main>
+            </main>
         <!-- End Main Dashboard Content -->
 
         <!-- Footer -->
-        <footer class="text-center py-4">
-            <p>&copy; 2024 Organ Donation Platform. All Rights Reserved.</p>
-        </footer>
+                <footer class="text-center py-4">
+                    <p>&copy; 2024 Organ Donation Platform. All Rights Reserved.</p>
+                </footer>
         <!-- End Footer -->
 
         <!-- Scripts -->

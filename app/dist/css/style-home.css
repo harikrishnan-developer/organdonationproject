@@ -63,7 +63,9 @@ nav {
 }
 
 #logo {
-    width: 200px; /* Adjusted logo size */
+    width: 120px; /* Reduce width for better fit */
+    max-height: 60px; /* Limit height to fit header */
+    object-fit: contain;
     padding: 0;
 }
 

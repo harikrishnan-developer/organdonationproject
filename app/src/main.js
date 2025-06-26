@@ -151,9 +151,9 @@ const App = {
         }
 
         try {
-            // Get the accounts
+        // Get the accounts
             this.accounts = await this.web3.eth.getAccounts();
-            console.log(this.accounts);
+        console.log(this.accounts);
 
             this.contractInstance = new this.web3.eth.Contract(
                 artifact.abi,
@@ -180,9 +180,9 @@ const App = {
             console.log("Connected accounts:", this.accounts);
 
             this.contractInstance = new this.web3.eth.Contract(
-                artifact.abi,
-                contractAddress
-            );
+            artifact.abi,
+            contractAddress
+        );
 
             // Update UI after connecting
             this.updateUI();
@@ -196,20 +196,87 @@ const App = {
         const connectButton = document.getElementById('connectWalletBtn');
         const formContainer = document.getElementById('registrationForm');
         const walletInfo = document.getElementById('walletInfo');
-        
+        const allowedDonorAccount = '0xDcC47A13d3b7162Cb202D7110fEaff9BE84a5e85'.toLowerCase();
+        const allowedPatientAccount = '0xfebabf937d7683a0e490061cb8fcd0a9fc3fe3b6'.toLowerCase();
+        let accessDeniedDiv = document.getElementById('accessDeniedDonor');
+        if (formContainer) {
+            if (!accessDeniedDiv) {
+                accessDeniedDiv = document.createElement('div');
+                accessDeniedDiv.id = 'accessDeniedDonor';
+                accessDeniedDiv.className = 'alert alert-danger mt-4';
+                accessDeniedDiv.style.display = 'none';
+                accessDeniedDiv.innerText = 'Access Denied: Only the authorized account can register as a donor.';
+                formContainer.parentNode.insertBefore(accessDeniedDiv, formContainer);
+            }
+        }
+        let accessDeniedPatientDiv = document.getElementById('accessDeniedPatient');
+        if (formContainer) {
+            if (!accessDeniedPatientDiv) {
+                accessDeniedPatientDiv = document.createElement('div');
+                accessDeniedPatientDiv.id = 'accessDeniedPatient';
+                accessDeniedPatientDiv.className = 'alert alert-danger mt-4';
+                accessDeniedPatientDiv.style.display = 'none';
+                accessDeniedPatientDiv.innerText = 'Access Denied: Only the authorized account can register as a patient.';
+                formContainer.parentNode.insertBefore(accessDeniedPatientDiv, formContainer);
+            }
+        }
         if (connectButton && formContainer) {
             if (this.accounts && this.accounts.length > 0) {
-                // Connected
-                connectButton.style.display = 'none';
-                formContainer.style.display = 'block';
-                if (walletInfo) {
-                    walletInfo.innerHTML = `Connected: ${this.accounts[0].substring(0, 6)}...${this.accounts[0].substring(38)}`;
-                    walletInfo.style.display = 'block';
+                const userAccount = this.accounts[0].toLowerCase();
+                // Donor registration page restriction
+                if (window.location.pathname.includes('donor-registration.html')) {
+                    if (userAccount === allowedDonorAccount) {
+                        connectButton.style.display = 'none';
+                        formContainer.style.display = 'block';
+                        accessDeniedDiv.style.display = 'none';
+                        if (walletInfo) {
+                            walletInfo.innerHTML = `Connected: ${this.accounts[0].substring(0, 6)}...${this.accounts[0].substring(38)}`;
+                            walletInfo.style.display = 'block';
+                        }
+                    } else {
+                        connectButton.style.display = 'none';
+                        formContainer.style.display = 'none';
+                        accessDeniedDiv.style.display = 'block';
+                        if (walletInfo) {
+                            walletInfo.innerHTML = `Connected: ${this.accounts[0].substring(0, 6)}...${this.accounts[0].substring(38)}`;
+                            walletInfo.style.display = 'block';
+                        }
+                    }
+                // Patient registration page restriction
+                } else if (window.location.pathname.includes('patient-registration.html')) {
+                    if (userAccount === allowedPatientAccount) {
+                        connectButton.style.display = 'none';
+                        formContainer.style.display = 'block';
+                        accessDeniedPatientDiv.style.display = 'none';
+                        if (walletInfo) {
+                            walletInfo.innerHTML = `Connected: ${this.accounts[0].substring(0, 6)}...${this.accounts[0].substring(38)}`;
+                            walletInfo.style.display = 'block';
+                        }
+                    } else {
+                        connectButton.style.display = 'none';
+                        formContainer.style.display = 'none';
+                        accessDeniedPatientDiv.style.display = 'block';
+                        if (walletInfo) {
+                            walletInfo.innerHTML = `Connected: ${this.accounts[0].substring(0, 6)}...${this.accounts[0].substring(38)}`;
+                            walletInfo.style.display = 'block';
+                        }
+                    }
+                } else {
+                    // Default behavior for other pages
+                    connectButton.style.display = 'none';
+                    formContainer.style.display = 'block';
+                    accessDeniedDiv.style.display = 'none';
+                    accessDeniedPatientDiv.style.display = 'none';
+                    if (walletInfo) {
+                        walletInfo.innerHTML = `Connected: ${this.accounts[0].substring(0, 6)}...${this.accounts[0].substring(38)}`;
+                        walletInfo.style.display = 'block';
+                    }
                 }
             } else {
-                // Not connected
                 connectButton.style.display = 'block';
                 formContainer.style.display = 'none';
+                if (accessDeniedDiv) accessDeniedDiv.style.display = 'none';
+                if (accessDeniedPatientDiv) accessDeniedPatientDiv.style.display = 'none';
                 if (walletInfo) {
                     walletInfo.style.display = 'none';
                 }
@@ -328,26 +395,26 @@ const App = {
         }
 
         // Try searching by Medical ID first
-        let validate = false;
+            let validate = false;
         if (user === "Donor") {
             validate = await this.contractInstance.methods.validateDonor(input).call();
         } else if (user === "Patient") {
             validate = await this.contractInstance.methods.validatePatient(input).call();
-        }
+            }
 
-        if (validate) {
+            if (validate) {
             // Found by Medical ID
             if (user === "Donor") {
                 await this.contractInstance.methods.getDonor(input).call().then(function(result){
-                    document.getElementById("search"+user+"Check").innerHTML = null;
-                    assignSearchValues(result, user);
-                });
+                        document.getElementById("search"+user+"Check").innerHTML = null;
+                        assignSearchValues(result, user);
+                    });
             } else if (user === "Patient") {
                 await this.contractInstance.methods.getPatient(input).call().then(function(result){
-                    document.getElementById("search"+user+"Check").innerHTML = null;
-                    assignSearchValues(result, user);
-                });
-            }
+                        document.getElementById("search"+user+"Check").innerHTML = null;
+                        assignSearchValues(result, user);
+                    });
+                }
             return;
         }
 
@@ -396,7 +463,7 @@ const App = {
             document.getElementById("get"+user+"Height").innerHTML = '';
         } else {
             document.getElementById("search"+user+"Check").innerHTML = "No match found!";
-            clearSearchValues(user);
+                clearSearchValues(user);
         }
     },
 
@@ -635,10 +702,8 @@ const App = {
         // Initialize AI matcher
         const aiMatcher = new AITransplantMatcher();
         
-        // Load and train AI model
-        await aiMatcher.loadTrainingData();
-        aiMatcher.trainModel();
-        
+        // Load random forest model (no training in browser)
+        await aiMatcher.loadRandomForestModel();
         document.getElementById("aiStatus").innerHTML = "Ready";
         document.getElementById("aiStatus").className = "badge badge-success";
 
@@ -817,9 +882,6 @@ const App = {
         // Find best match
         const bestMatch = recommendations[0];
 
-        // Get training data count safely
-        const trainingDataCount = aiMatcher && aiMatcher.trainingData ? aiMatcher.trainingData.length : 'Unknown';
-
         insightsDiv.innerHTML = `
             <div class="row">
                 <div class="col-md-6">
@@ -838,7 +900,7 @@ const App = {
                         <li><strong>Most Requested Organ:</strong> ${mostCommonOrgan}</li>
                         <li><strong>Best Match Score:</strong> ${(bestMatch.combinedScore * 100).toFixed(1)}%</li>
                         <li><strong>Patient-Donor Ratio:</strong> ${patients.length}:${donors.length}</li>
-                        <li><strong>AI Model Confidence:</strong> High (trained on ${trainingDataCount} records)</li>
+                        <li><strong>AI Model Confidence:</strong> High (trained on 10000 records)</li>
                     </ul>
                 </div>
             </div>
@@ -854,47 +916,8 @@ const App = {
                 </div>
             </div>
         `;
-    },
-
-    verifyDonor: async function(medical_id) {
-        try {
-            await this.contractInstance.methods.verifyDonor(medical_id).send({from: this.accounts[0]});
-            alert('Donor verified!');
-            this.viewDonorsWithVerify();
-        } catch (e) {
-            alert('Verification failed or not authorized.');
-        }
-    },
-
-    viewDonorsWithVerify: async function() {
-        this.accounts = await this.web3.eth.getAccounts();
-        this.contractInstance = new this.web3.eth.Contract(
-            artifact.abi,
-            contractAddress
-        );
-        const DonorCount = await this.contractInstance.methods.getCountOfDonors().call();
-        const DonorIDs = await this.contractInstance.methods.getAllDonorIDs().call();
-        let table = document.getElementById('donorTable');
-        table.innerHTML = '';
-        // Table header
-        let header = `<tr><th>#</th><th>Full Name</th><th>Age</th><th>Gender</th><th>Medical ID</th><th>Blood Type</th><th>Organ(s)</th><th>Weight(kg)</th><th>Height(cm)</th><th>Status</th><th>Action</th></tr>`;
-        table.innerHTML += header;
-        // Check if user is verifier
-        let isVerifier = false;
-        try {
-            isVerifier = await this.contractInstance.methods.hasRole(this.contractInstance.methods.VERIFIER_ROLE().call(), this.accounts[0]);
-        } catch (e) {}
-        for (let i=0; i<DonorCount; i++) {
-            let result = await this.contractInstance.methods.getDonor(DonorIDs[i]).call();
-            let verified = await this.contractInstance.methods.isDonorVerified(DonorIDs[i]).call();
-            let status = verified ? `<span class='badge badge-success'>Verified</span>` : `<span class='badge badge-warning'>Not Verified</span>`;
-            let action = '';
-            if (!verified && isVerifier) {
-                action = `<button class='btn btn-sm btn-success' onclick='App.verifyDonor("${DonorIDs[i]}")'>Verify</button>`;
-            }
-            table.innerHTML += `<tr><td>${i+1}</td><td>${result[0]}</td><td>${result[1]}</td><td>${result[2]}</td><td>${DonorIDs[i]}</td><td>${result[3]}</td><td>${result[4]}</td><td>${result[5]}</td><td>${result[6]}</td><td>${status}</td><td>${action}</td></tr>`;
-        }
     }
+
 }
 
 window.App = App;

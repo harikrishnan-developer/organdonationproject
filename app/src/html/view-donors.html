@@ -51,7 +51,7 @@
                     <div class="col-md-12">
                         <h3>Details of Registered Donors</h3>
                         <div class="table-responsive">
-                            <table id="donorTable">
+                            <table>
                                 <!-- here goes table generated data! -->
                             </table>
                         </div>
@@ -61,13 +61,11 @@
                             
         </main>
         
+        <button onclick="window.history.back()" class="btn btn-secondary mt-3 ml-3">← Back</button>
     </body>
 
         <script src="../main.js"></script>
         <script>
-            window.onload = async function() {
-                await App.start();
-                App.viewDonorsWithVerify();
-            };
+            window.onload = App.viewDonors();
         </script>
 </html>

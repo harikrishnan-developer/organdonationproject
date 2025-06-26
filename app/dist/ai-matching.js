@@ -1,7 +1,9 @@
+import { RandomForestRegression } from 'ml-random-forest';
+
 // AI-Powered Transplant Matching System
 // Uses machine learning to predict match scores based on donor-patient compatibility
 
-class AITransplantMatcher {
+export default class AITransplantMatcher {
     constructor() {
         this.trainingData = [];
         this.model = null;
@@ -102,9 +104,9 @@ class AITransplantMatcher {
         return compatibilityMatrix[donorBlood]?.[patientBlood] || 0;
     }
 
-    // Simple linear regression model for match score prediction
+    // Train the Random Forest model for match score prediction
     trainModel() {
-        console.log('[AI-DEBUG] 4. Starting model training...');
+        console.log('[AI-DEBUG] 4. Starting Random Forest model training...');
         if (this.trainingData.length === 0) {
             console.error('[AI-DEBUG] ERROR: Cannot train model, no training data.');
             return false;
@@ -137,183 +139,70 @@ class AITransplantMatcher {
         });
 
         console.log(`[AI-DEBUG] 5. Prepared ${features.length} feature sets for training.`);
+        if (features.length === 0) {
+            console.error('[AI-DEBUG] ERROR: No valid features to train on.');
+            return false;
+        }
+
         if (features.length > 0) {
             console.log('[AI-DEBUG] First feature set for training:');
             console.log(features[0]);
             console.log(`[AI-DEBUG] Corresponding target score: ${targets[0]}`);
         }
+        
+        // Train Random Forest Regression model
+        const options = {
+            seed: 3,
+            maxFeatures: 4,
+            replacement: false,
+            nEstimators: 100 // Number of trees in the forest
+        };
 
-        // Simple linear regression using least squares
-        this.model = this.trainLinearRegression(features, targets);
+        this.model = new RandomForestRegression(options);
+        this.model.train(features, targets);
         this.isModelTrained = true;
-        console.log('[AI-DEBUG] 6. AI model trained successfully.');
-        console.log('[AI-DEBUG] Model Coefficients (beta):');
-        console.log(this.model.coefficients);
+        console.log('[AI-DEBUG] 6. AI Random Forest model trained successfully.');
         return true;
     }
 
-    // Train linear regression model
-    trainLinearRegression(features, targets) {
-        const n = features.length;
-        const m = features[0].length;
-        
-        // Normalize features
-        const normalizedFeatures = this.normalizeFeatures(features);
-        
-        // Add bias term
-        const X = normalizedFeatures.map(f => [1, ...f]);
-        
-        // Calculate coefficients using normal equation
-        const XT = this.transpose(X);
-        const XTX = this.multiply(XT, X);
-        const XTy = this.multiply(XT, targets);
-        
-        // Solve (X^T * X) * beta = X^T * y
-        const beta = this.solveLinearSystem(XTX, XTy);
-        
-        return {
-            coefficients: beta,
-            featureMeans: this.calculateMeans(features),
-            featureStds: this.calculateStds(features)
-        };
-    }
-
-    // Normalize features
-    normalizeFeatures(features) {
-        const means = this.calculateMeans(features);
-        const stds = this.calculateStds(features);
-        
-        return features.map(feature => 
-            feature.map((val, i) => (val - means[i]) / (stds[i] || 1))
-        );
-    }
-
-    // Calculate means
-    calculateMeans(features) {
-        const m = features[0].length;
-        const means = new Array(m).fill(0);
-        
-        features.forEach(feature => {
-            feature.forEach((val, i) => {
-                means[i] += val;
-            });
-        });
-        
-        return means.map(mean => mean / features.length);
-    }
-
-    // Calculate standard deviations
-    calculateStds(features) {
-        const means = this.calculateMeans(features);
-        const m = features[0].length;
-        const variances = new Array(m).fill(0);
-        
-        features.forEach(feature => {
-            feature.forEach((val, i) => {
-                variances[i] += Math.pow(val - means[i], 2);
-            });
-        });
-        
-        return variances.map(variance => Math.sqrt(variance / features.length));
-    }
-
-    // Matrix operations
-    transpose(matrix) {
-        return matrix[0].map((_, i) => matrix.map(row => row[i]));
-    }
-
-    multiply(a, b) {
-        if (Array.isArray(b[0])) {
-            // Matrix multiplication
-            return a.map(row => 
-                b[0].map((_, j) => 
-                    row.reduce((sum, val, k) => sum + val * b[k][j], 0)
-                )
-            );
-        } else {
-            // Matrix-vector multiplication
-            return a.map(row => 
-                row.reduce((sum, val, i) => sum + val * b[i], 0)
-            );
-        }
-    }
-
-    // Solve linear system using Gaussian elimination
-    solveLinearSystem(A, b) {
-        const n = A.length;
-        const augmented = A.map((row, i) => [...row, b[i]]);
-        
-        // Forward elimination
-        for (let i = 0; i < n; i++) {
-            let maxRow = i;
-            for (let k = i + 1; k < n; k++) {
-                if (Math.abs(augmented[k][i]) > Math.abs(augmented[maxRow][i])) {
-                    maxRow = k;
-                }
-            }
-            
-            [augmented[i], augmented[maxRow]] = [augmented[maxRow], augmented[i]];
-            
-            for (let k = i + 1; k < n; k++) {
-                const factor = augmented[k][i] / augmented[i][i];
-                for (let j = i; j <= n; j++) {
-                    augmented[k][j] -= factor * augmented[i][j];
-                }
-            }
-        }
-        
-        // Back substitution
-        const x = new Array(n).fill(0);
-        for (let i = n - 1; i >= 0; i--) {
-            let sum = 0;
-            for (let j = i + 1; j < n; j++) {
-                sum += augmented[i][j] * x[j];
-            }
-            x[i] = (augmented[i][n] - sum) / augmented[i][i];
-        }
-        
-        return x;
-    }
-
-    // Predict match score for a donor-patient-organ combination
+    // Predict match score using the trained model
     predictMatchScore(donor, patient, organ) {
-        if (!this.isModelTrained) {
-            console.error('[AI-DEBUG] ERROR: Model not trained, cannot predict.');
-            return 0;
+        if (!this.isModelTrained || !this.model) {
+            if (localStorage.getItem('aiDebug') === 'true') {
+                console.warn('[AI-DEBUG] WARNING: Model not trained. Falling back to basic compatibility score.');
+            }
+            // Fallback to basic compatibility if model is not ready
+            return this.calculateBloodCompatibility(donor.bloodType, patient.bloodType);
         }
 
-        const features = this.encodeFeatures(donor, patient, organ);
-        const featureVector = [
-            features.donorBlood,
-            features.patientBlood,
-            features.donorAge,
-            features.patientAge,
-            features.ageDiff,
-            features.organ,
-            features.bloodCompatibility
+        const featureVector = this.encodeFeatures(donor, patient, organ);
+        const features = [
+            featureVector.donorBlood,
+            featureVector.patientBlood,
+            featureVector.donorAge,
+            featureVector.patientAge,
+            featureVector.ageDiff,
+            featureVector.organ,
+            featureVector.bloodCompatibility
         ];
 
-        console.log('[AI-DEBUG] 7. Predicting score for:', { donor, patient, organ });
-        console.log('[AI-DEBUG] Input Features for Prediction:', featureVector);
+        // Random Forest prediction
+        const prediction = this.model.predict([features]);
+        let score = prediction[0];
+        
+        // Clamp the score to be between 0 and 1
+        score = Math.max(0, Math.min(1, score));
 
-        // Normalize features
-        const normalizedFeatures = featureVector.map((val, i) => 
-            (val - this.model.featureMeans[i]) / (this.model.featureStds[i] || 1)
-        );
-
-        // Add bias term and predict
-        const input = [1, ...normalizedFeatures];
-        const prediction = input.reduce((sum, val, i) => 
-            sum + val * this.model.coefficients[i], 0
-        );
-
-        const finalScore = Math.max(0, Math.min(1, prediction));
-        console.log(`[AI-DEBUG] 8. Predicted Score: ${finalScore}`);
-        // Ensure prediction is between 0 and 1
-        return finalScore;
+        if (localStorage.getItem('aiDebug') === 'true') {
+            console.log(`[AI-DEBUG] AI Prediction for ${donor.name} -> ${patient.name} (${organ}):`);
+            console.log(`[AI-DEBUG]   - Features:`, features);
+            console.log(`[AI-DEBUG]   - Predicted Score: ${score.toFixed(4)}`);
+        }
+        
+        return score;
     }
 
-    // Get match recommendations with AI scores
+    // Get ranked match recommendations for all patients and donors
     async getMatchRecommendations(patients, donors) {
         if (!this.isModelTrained) {
             await this.loadTrainingData();

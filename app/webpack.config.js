@@ -43,11 +43,12 @@ module.exports = {
     new CopyWebpackPlugin([{ from: "./src/images/Boini.png", to: "images/Boini.png" }]),
     new CopyWebpackPlugin([{ from: "./src/images/Rahul Sabinkar.png", to: "images/Rahul Sabinkar.png" }]),
     new CopyWebpackPlugin([{ from: "./src/images/Sai Manikanta.png", to: "images/Sai Manikanta.png" }]),
-    new CopyWebpackPlugin([{ from: "./src/ai-matching.js", to: "ai-matching.js" }]),
+    new CopyWebpackPlugin([{ from: "./src/js/ai-matching.js", to: "js/ai-matching.js" }]),
     new CopyWebpackPlugin([{ from: "../transplant_dataa.csv", to: "transplant_dataa.csv" }]),
     new CopyWebpackPlugin([{ from: "./test-ai.html", to: "test-ai.html" }]),
     new CopyWebpackPlugin([{ from: "./status-check.html", to: "status-check.html" }]),
     new CopyWebpackPlugin([{from: "./src/html/admin.html", to: "admin.html"}]),
+    new CopyWebpackPlugin([{ from: "./src/images/Screenshot__14_-removebg-preview.png", to: "images/Screenshot__14_-removebg-preview.png" }]),
   ],
   devServer: { 
     contentBase: path.join(__dirname, "dist"), 
