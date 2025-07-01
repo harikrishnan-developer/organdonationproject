@@ -1,10 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.10;
 
-import "@openzeppelin/contracts/access/AccessControl.sol";
-
-contract DonorContract is AccessControl {
-    bytes32 public constant VERIFIER_ROLE = keccak256("VERIFIER_ROLE");
+contract DonorContract {
+    address public owner;
+    mapping(address => bool) public verifiers;
 
     struct pledged
     {
@@ -51,9 +50,27 @@ contract DonorContract is AccessControl {
     string[] DonorsArray;
     string[] PatientsArray;
 
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Only owner can call this function");
+        _;
+    }
+
+    modifier onlyVerifier() {
+        require(msg.sender == owner || verifiers[msg.sender], "Only verifier can call this function");
+        _;
+    }
+
     constructor() {
-        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
-        _setupRole(VERIFIER_ROLE, msg.sender);
+        owner = msg.sender;
+        verifiers[msg.sender] = true;
+    }
+
+    function addVerifier(address _verifier) public onlyOwner {
+        verifiers[_verifier] = true;
+    }
+
+    function removeVerifier(address _verifier) public onlyOwner {
+        verifiers[_verifier] = false;
     }
 
     function setPledge(string memory _fullname, uint _age, string memory _gender, string memory _medical_id,
@@ -207,10 +224,10 @@ contract DonorContract is AccessControl {
     }
 
     // Verifier functions
-    function verifyDonor(string memory _medical_id) public onlyRole(VERIFIER_ROLE) {
+    function verifyDonor(string memory _medical_id) public onlyVerifier {
         donorMap[_medical_id].verified = true;
     }
-    function verifyPatient(string memory _medical_id) public onlyRole(VERIFIER_ROLE) {
+    function verifyPatient(string memory _medical_id) public onlyVerifier {
         patientMap[_medical_id].verified = true;
     }
     function isDonorVerified(string memory _medical_id) public view returns (bool) {

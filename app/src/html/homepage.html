@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,600;0,700;0,800;0,900;1,700;1,900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/bootstrap.css">
     <link rel="stylesheet" href="../css/style-home.css">
-    <link rel="stylesheet" href="../css/fontawesome-all.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../main.js">
     <link rel="icon" href="images/organ-donation-logo-new.svg">
 
@@ -28,57 +28,130 @@
                 </div>
                 <ul>
                     <li><a class="active" href="">Home</a></li>
-                    <li><a href="../index.html">Dashboard</a></li>
+                    <li class="nav-item" id="dashboard-link" style="display: none;"><a href="../index.html">Dashboard</a></li>
                     <li><a href="about-us.html">About Us</a></li>
                     <li><a href="contact.html">Contact</a></li>
                     <li><a href="awareness.html">Awareness</a></li>
-                    <li><a href="admin.html">Admin</a></li>
+                    <li class="nav-item" id="admin-link" style="display: none;"><a href="admin.html">Admin</a></li>
                 </ul>
             </nav>
         </div> <!-- end of container -->
     </header>
 
     <main>
+        <!-- Hero Section with Enhanced Animation -->
         <div class="container hero-section">
             <div class="row w-100">
                 <div class="col-lg-7 banner">
-                    <h1>Pledge To Become <br>A Donor</h1>
-                    <h3>More than 100,000 people are waiting for a lifesaving transplant. You can help.</h3>
-                    <a href="donor-pledge.html" class="btn btn-lg btn-success">Pledge To Become A Donor</a>
+                    <div class="hero-content">
+                        <h1 class="hero-title">Pledge To Become <br><span class="highlight">A Donor</span></h1>
+                        <div class="hero-quote">
+                            <p>"The greatest gift of life is the gift of life itself. Through organ donation, we have the power to give someone a second chance at life."</p>
+                        </div>
+                        <h3 class="hero-subtitle">More than <span class="counter" data-target="100000">0</span> people are waiting for a lifesaving transplant. You can help.</h3>
+                        <div class="hero-stats">
+                            <div class="stat-item">
+                                <span class="stat-number counter" data-target="17">0</span>
+                                <span class="stat-label">Die daily waiting</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number counter" data-target="75">0</span>
+                                <span class="stat-label">Lives saved per donor</span>
+                            </div>
+                        </div>
+                        <a href="donor-pledge.html" class="btn btn-lg btn-success cta-button">
+                            <span>Pledge To Become A Donor</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
                 </div>
 
                 <div class="col-lg-5">
-                    <div class="slider"><img src="../images/header-image-new.png" alt="Organ donation illustration"></div>
+                    <div class="slider">
+                        <img src="../images/header-image-new.png" alt="Organ donation illustration" class="hero-image">
+                        <div class="floating-elements">
+                            <div class="float-card card-1">
+                                <i class="fas fa-heart"></i>
+                                <span>Save Lives</span>
+                            </div>
+                            <div class="float-card card-2">
+                                <i class="fas fa-shield-alt"></i>
+                                <span>Secure Platform</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div> <!-- end of row -->
         </div> <!-- end of container -->
 
+        <!-- Enhanced "The Need" Section -->
         <div class="container-bg">
             <div class="container">
                 <h1 id="heading">The Need</h1>
                 <div class="row">
                     <div class="col-lg-4">
                         <div class="content-box">
+                            <div class="icon-wrapper">
                             <img src="../images/waiting-list-icon.svg" alt="">
+                            </div>
+                            <h4>Every 9 Minutes</h4>
                             <p>A person is added to the waiting list every 9 minutes</p>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 85%"></div>
+                            </div>
                         </div>
                     </div>
                     <div class="col-lg-4">
                         <div class="content-box">
+                            <div class="icon-wrapper">
                             <img src="../images/transplant-icon.svg" alt="">
+                            </div>
+                            <h4>17 Daily Deaths</h4>
                             <p>17 people die each day while waiting for an organ transplant</p>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 70%"></div>
+                            </div>
                         </div>
                     </div>
                     <div class="col-lg-4">
                         <div class="content-box">
+                            <div class="icon-wrapper">
                             <img src="../images/donation-icon.svg" alt="">
+                            </div>
+                            <h4>75+ Lives Enhanced</h4>
                             <p>One organ, eye and tissue donor can save and heal more than 75 lives</p>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 95%"></div>
+                            </div>
                         </div>
                     </div>
                 </div> <!-- end of row -->
-            </div> <!-- end of conatiner -->
-        </div> <!-- end of conatiner-bg -->
+            </div> <!-- end of container -->
+        </div> <!-- end of container-bg -->
 
+        <!-- New Impact Section -->
+        <div class="impact-section">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="impact-content text-center">
+                            <h2>Your Impact Matters</h2>
+                            <p>Join thousands of donors who have already made a difference. Our blockchain-powered platform ensures transparency and trust in every donation.</p>
+                            <div class="impact-stats">
+                                <div class="impact-stat">
+                                    <div class="stat-circle">
+                                        <span class="counter" data-target="20">0</span>
+                                    </div>
+                                    <p>Platform Users</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enhanced FAQ Section -->
         <div class="container-bg-1">
             <div class="container">
                 <h1 id="heading">FAQ's</h1>
@@ -87,69 +160,91 @@
                         <div class="accordian">
                             <div>
                                 <input type="checkbox" name="example_accordian" id="section1" class="accordian_input">
-                                <label for="section1" class="accordian_label">Who can be a donor?</label>
+                                <label for="section1" class="accordian_label">What organs and tissues can be donated?</label>
                                 <div class="accordian_content">
-                                    <p>Who can be a donor?</p>
-                                    <p>People of all ages and medical histories should consider themselves potential donors. Your medical condition at the time of death will determine what organs and tissues can be donated.<br>
-
-                                        A national system matches available organs from the donor with people on the waiting list based on blood type, body size, how sick they are, donor distance, tissue type and time on the list. Sexual orientation, gender, gender identity or expression, race, income, celebrity and social status are never considered.</p>
+                                    <p>What organs and tissues can be donated?</p>
+                                    <p>Organs that can be donated include: heart, kidneys, liver, lungs, pancreas, and intestines. Tissues that can be donated include: corneas, skin, bone, heart valves, blood vessels, and connective tissue. One donor can save up to 8 lives through organ donation and enhance the lives of 75+ people through tissue donation.</p>
                                 </div>
                             </div>
                             <div>
                                 <input type="checkbox" name="example_accordian" id="section2" class="accordian_input">
-                                <label for="section2" class="accordian_label">How does the deceased donation process work?</label>
+                                <label for="section2" class="accordian_label">How does blockchain technology improve organ donation?</label>
                                 <div class="accordian_content">
-                                    <p>How does the deceased donation process work?</p>
-                                    <p>Deceased organ donation is the process of giving an organ or a part of an organ, at the time of the donor's death, for the purpose of transplantation to another person. Only after all efforts to save the patient's life have been exhausted, tests have been performed to confirm the absence of brain or brainstem activity, and brain death has been declared, is donation a possibility.
-
-                                        The state donor registry and National Donate Life Registry are searched securely online to determine if the patient has authorized donation. If the potential donor is not found in a registry, their next of kin or legally authorized representative is offered the opportunity to authorize the donation. Donation and transplantation professionals follow national policy to determine which organs can be transplanted and to which patients on the national transplant waiting list the organs are to be allocated.</p>
+                                    <p>How does blockchain technology improve organ donation?</p>
+                                    <p>Blockchain technology provides secure, transparent, and tamper-proof records of organ donations. It ensures data integrity, prevents fraud, enables real-time tracking of organ matches, and creates an immutable audit trail. This technology helps build trust between donors, recipients, and healthcare providers while streamlining the matching process.</p>
                                 </div>
                             </div>
                             <div>
                                 <input type="checkbox" name="example_accordian" id="section3" class="accordian_input">
-                                <label for="section3" class="accordian_label">Is there a cost to be an organ, eye and tissue donor?</label>
+                                <label for="section3" class="accordian_label">What is the difference between living and deceased donation?</label>
                                 <div class="accordian_content">
-                                    <p>Is there a cost to be an organ, eye and tissue donor?</p>
-                                    <p>There is no cost to the donor's family or estate for donation. The donor family pays only for medical expenses before death and costs associated with funeral arrangements.</p>
+                                    <p>What is the difference between living and deceased donation?</p>
+                                    <p>Living donation occurs when a living person donates an organ (like a kidney or part of the liver) to someone in need. Deceased donation happens after a person has been declared brain dead and their organs are donated. Living donation can be directed (to a specific person) or non-directed (to anyone on the waiting list). Both types save lives and are equally valuable.</p>
                                 </div>
                             </div>
                             <div>
                                 <input type="checkbox" name="example_accordian" id="section4" class="accordian_input">
-                                <label for="section4" class="accordian_label">Does registering as a donor change my patient care?</label>
+                                <label for="section4" class="accordian_label">How do I register as an organ donor?</label>
                                 <div class="accordian_content">
-                                    <p>Does registering as a donor change my patient care?</p>
-                                    <p>Your life always comes first. Doctors work hard to save every patient's life, but sometimes there is a complete and irreversible loss of brain function. The patient is declared clinically and legally dead. Only then is donation an option.</p>
+                                    <p>How do I register as an organ donor?</p>
+                                    <p>You can register as an organ donor through our platform by clicking "Pledge To Become A Donor" and filling out the registration form. You can also register through your state's donor registry, at your local DMV, or through the National Donate Life Registry. It's important to discuss your decision with your family so they understand your wishes.</p>
                                 </div>
                             </div>
                             <div>
                                 <input type="checkbox" name="example_accordian" id="section5" class="accordian_input">
-                                <label for="section5" class="accordian_label">I want to learn more about living donation. Where should I look?</label>
+                                <label for="section5" class="accordian_label">What are the medical criteria for organ donation?</label>
                                 <div class="accordian_content">
-                                    <p>I want to learn more about living donation. Where should I look?</p>
-                                    <p>Living organ donation offers another choice for some transplant candidates, reducing their time on the waiting list and leading to better long term outcomes for the recipient.
-
-                                        Living tissue donation, birth tissue, is used to promote healing and to treat burns and painful wounds.</p>
+                                    <p>What are the medical criteria for organ donation?</p>
+                                    <p>Medical criteria vary by organ and are determined at the time of death. Factors include age, medical history, cause of death, and current health status. Most people can donate some organs and tissues regardless of age or medical history. The transplant team evaluates each potential donor individually to determine what can be safely donated.</p>
+                                </div>
+                            </div>
+                            <div>
+                                <input type="checkbox" name="example_accordian" id="section6" class="accordian_input">
+                                <label for="section6" class="accordian_label">How is organ matching determined?</label>
+                                <div class="accordian_content">
+                                    <p>How is organ matching determined?</p>
+                                    <p>Organ matching is based on several factors including blood type, body size, medical urgency, geographic distance, and time on the waiting list. Our blockchain platform uses advanced algorithms to ensure fair and efficient matching while maintaining transparency. The system prioritizes patients based on medical need and compatibility.</p>
+                                </div>
+                            </div>
+                            <div>
+                                <input type="checkbox" name="example_accordian" id="section7" class="accordian_input">
+                                <label for="section7" class="accordian_label">Can I change my mind about being a donor?</label>
+                                <div class="accordian_content">
+                                    <p>Can I change my mind about being a donor?</p>
+                                    <p>Yes, you can change your donor status at any time. You can update your registration through our platform or contact your state's donor registry. It's important to inform your family of any changes to your wishes. Your decision to donate is always voluntary and can be modified as your circumstances change.</p>
+                                </div>
+                            </div>
+                            <div>
+                                <input type="checkbox" name="example_accordian" id="section8" class="accordian_input">
+                                <label for="section8" class="accordian_label">What happens to my body after donation?</label>
+                                <div class="accordian_content">
+                                    <p>What happens to my body after donation?</p>
+                                    <p>Organ donation is performed with the same care and respect as any other surgery. The donor's body is treated with dignity throughout the process. Donation does not disfigure the body or interfere with traditional funeral arrangements, including open-casket services. The donor's family can still have a normal funeral and burial or cremation.</p>
                                 </div>
                             </div>
                         </div> <!-- end of accordian -->
                     </div> <!-- end of col -->
                 </div> <!-- end of row -->
-            </div> <!-- end of conatiner -->
-        </div> <!-- end of conatiner-bg -->
+            </div> <!-- end of container -->
+        </div> <!-- end of container-bg -->
     </main>
 
     <footer>
         <div class="container">
             <div class="footer-logo"><img src="../images/organ-donation-platform-logo-white.svg" alt="Organ Donation Platform Logo"></div>
-        </div> <!-- end of conatiner -->        
+        </div> <!-- end of container -->        
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
       // MetaMask access control for homepage
       document.addEventListener('DOMContentLoaded', async function() {
-        const REQUIRED_ACCOUNT = '0xcb53b1f933012cef64a6287f34a9aec91f9053b6'.toLowerCase();
+        const REQUIRED_ACCOUNT = '0x7eE43d400D8D5334a172A4C42A21B60a0e96449F'.toLowerCase();
+        const ADMIN_ACCOUNT = '0x0f782832481f9ea805285E56DA93EDf191E075d3'.toLowerCase();
         const mainContent = document.querySelector('main');
+        const dashboardLink = document.getElementById('dashboard-link');
+        const adminLink = document.getElementById('admin-link');
+        
         // Helper to show/hide
         function showAccessDenied() {
           if (mainContent) mainContent.style.display = 'none';
@@ -159,19 +254,118 @@
           msg.innerHTML = '<h3 style="color:red">Access Denied</h3><p>You must connect MetaMask with an <b>authorized account</b> to access this page.</p>';
           document.body.insertBefore(msg, document.body.firstChild.nextSibling);
         }
+
+        // Function to update navigation visibility
+        function updateNavigationVisibility(account) {
+          if (account) {
+            const accountLower = account.toLowerCase();
+            
+            // Show Dashboard link for authorized homepage account
+            if (dashboardLink && accountLower === REQUIRED_ACCOUNT) {
+              dashboardLink.style.display = 'block';
+            }
+            
+            // Show Admin link for admin account
+            if (adminLink && accountLower === ADMIN_ACCOUNT) {
+              adminLink.style.display = 'block';
+            }
+          }
+        }
+
         if (typeof window.ethereum === 'undefined') {
           showAccessDenied();
           return;
         }
+        
         try {
           const accounts = await window.ethereum.request({ method: 'eth_accounts' });
-          if (!accounts || accounts.length === 0 || accounts[0].toLowerCase() !== REQUIRED_ACCOUNT) {
+          if (!accounts || accounts.length === 0) {
             showAccessDenied();
             return;
           }
+          
+          const currentAccount = accounts[0];
+          if (currentAccount.toLowerCase() !== REQUIRED_ACCOUNT) {
+            showAccessDenied();
+            return;
+          }
+          
+          // Update navigation visibility
+          updateNavigationVisibility(currentAccount);
+          
+          // Listen for account changes
+          window.ethereum.on('accountsChanged', function (accounts) {
+            if (accounts.length === 0) {
+              showAccessDenied();
+            } else {
+              updateNavigationVisibility(accounts[0]);
+            }
+          });
+          
         } catch (e) {
           showAccessDenied();
         }
+
+        // Counter Animation
+        const counters = document.querySelectorAll('.counter');
+        const speed = 200;
+
+        const animateCounter = (counter) => {
+          const target = +counter.getAttribute('data-target');
+          const count = +counter.innerText;
+          const increment = target / speed;
+
+          if (count < target) {
+            counter.innerText = Math.ceil(count + increment);
+            setTimeout(() => animateCounter(counter), 1);
+          } else {
+            counter.innerText = target.toLocaleString();
+          }
+        };
+
+        // Intersection Observer for counter animation
+        const observerOptions = {
+          threshold: 0.7,
+          rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              const counter = entry.target;
+              animateCounter(counter);
+              observer.unobserve(counter);
+            }
+          });
+        }, observerOptions);
+
+        counters.forEach(counter => {
+          observer.observe(counter);
+        });
+
+        // Smooth scroll for navigation links
+        document.querySelectorAll('nav a[href^="#"]').forEach(anchor => {
+          anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+              target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+              });
+            }
+          });
+        });
+
+        // Add scroll effect to header
+        window.addEventListener('scroll', () => {
+          const header = document.querySelector('header');
+          if (window.scrollY > 100) {
+            header.classList.add('scrolled');
+          } else {
+            header.classList.remove('scrolled');
+          }
+        });
       });
     </script>
 </body>

@@ -196,8 +196,8 @@ const App = {
         const connectButton = document.getElementById('connectWalletBtn');
         const formContainer = document.getElementById('registrationForm');
         const walletInfo = document.getElementById('walletInfo');
-        const allowedDonorAccount = '0xDcC47A13d3b7162Cb202D7110fEaff9BE84a5e85'.toLowerCase();
-        const allowedPatientAccount = '0xfebabf937d7683a0e490061cb8fcd0a9fc3fe3b6'.toLowerCase();
+        const allowedDonorAccount = '0x2Fe5B6648120ee69734346D1482599ef3605caaB'.toLowerCase();
+        const allowedPatientAccount = '0x12E76137000E2B3D0Ed09B657d2f138d19b37Cda'.toLowerCase();
         let accessDeniedDiv = document.getElementById('accessDeniedDonor');
         if (formContainer) {
             if (!accessDeniedDiv) {

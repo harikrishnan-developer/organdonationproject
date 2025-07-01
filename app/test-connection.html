@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ganache Connection Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.6.1/dist/web3.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        #results { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Ganache Connection Test</h1>
+    
+    <button onclick="testConnection()">Test Ganache Connection</button>
+    <button onclick="testContract()">Test Contract Connection</button>
+    <button onclick="getAccounts()">Get Accounts</button>
+    <button onclick="getNetworkId()">Get Network ID</button>
+    
+    <div id="results"></div>
+
+    <script>
+        let web3;
+        let contractAddress = '0x37f169eB9CCc1080a0de2b285a72BecCc6ADc432';
+        
+        function log(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}:</strong> ${message}`;
+            results.appendChild(div);
+            console.log(message);
+        }
+
+        async function testConnection() {
+            try {
+                log('Testing connection to Ganache...', 'info');
+                web3 = new Web3('http://127.0.0.1:7545');
+                
+                // Test if we can connect
+                const isListening = await web3.eth.net.isListening();
+                if (isListening) {
+                    log('✅ Successfully connected to Ganache!', 'success');
+                } else {
+                    log('❌ Ganache is not listening', 'error');
+                }
+            } catch (error) {
+                log(`❌ Connection failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function getNetworkId() {
+            try {
+                if (!web3) {
+                    log('❌ Web3 not initialized. Run connection test first.', 'error');
+                    return;
+                }
+                
+                const networkId = await web3.eth.net.getId();
+                log(`🌐 Network ID: ${networkId}`, 'info');
+                
+                if (networkId === 5777) {
+                    log('✅ Network ID matches expected value (5777)', 'success');
+                } else {
+                    log(`⚠️ Network ID is ${networkId}, expected 5777`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Failed to get network ID: ${error.message}`, 'error');
+            }
+        }
+
+        async function getAccounts() {
+            try {
+                if (!web3) {
+                    log('❌ Web3 not initialized. Run connection test first.', 'error');
+                    return;
+                }
+                
+                const accounts = await web3.eth.getAccounts();
+                log(`👥 Found ${accounts.length} accounts:`, 'info');
+                accounts.forEach((account, index) => {
+                    log(`   ${index + 1}. ${account}`, 'info');
+                });
+            } catch (error) {
+                log(`❌ Failed to get accounts: ${error.message}`, 'error');
+            }
+        }
+
+        async function testContract() {
+            try {
+                if (!web3) {
+                    log('❌ Web3 not initialized. Run connection test first.', 'error');
+                    return;
+                }
+                
+                log('Testing contract connection...', 'info');
+                
+                // Try to get contract code
+                const code = await web3.eth.getCode(contractAddress);
+                if (code !== '0x' && code !== '0x0') {
+                    log(`✅ Contract found at ${contractAddress}`, 'success');
+                    log(`📄 Contract code length: ${code.length} characters`, 'info');
+                } else {
+                    log(`❌ No contract found at ${contractAddress}`, 'error');
+                }
+                
+                // Try to get balance
+                const balance = await web3.eth.getBalance(contractAddress);
+                log(`💰 Contract balance: ${web3.utils.fromWei(balance, 'ether')} ETH`, 'info');
+                
+            } catch (error) {
+                log(`❌ Contract test failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-run connection test on page load
+        window.addEventListener('load', () => {
+            log('Page loaded. Click "Test Ganache Connection" to start.', 'info');
+        });
+    </script>
+</body>
+</html> 

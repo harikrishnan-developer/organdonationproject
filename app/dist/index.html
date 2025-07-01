@@ -17,97 +17,436 @@
 
         <script src="main.js"></script>
         <title>Dashboard - Organ Donation Platform</title>
+        
+        <style>
+            /* Sidebar */
+            .sidebar {
+                width: 280px;
+                background: linear-gradient(135deg, #232526 0%, #414345 100%);
+                color: #fff;
+                padding: 0;
+                position: fixed;
+                height: 100vh;
+                overflow-y: auto;
+                z-index: 1000;
+                box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            }
+            .sidebar-header {
+                padding: 20px;
+                text-align: center;
+                border-bottom: 1px solid rgba(255,255,255,0.1);
+            }
+            .sidebar-logo {
+                width: 60px;
+                height: 60px;
+                margin-bottom: 10px;
+            }
+            .sidebar-title {
+                font-size: 18px;
+                font-weight: 700;
+                margin: 0;
+                color: #fff;
+            }
+            .sidebar-subtitle {
+                font-size: 12px;
+                opacity: 0.8;
+                margin: 5px 0 0 0;
+                color: #e0e0e0;
+            }
+            .sidebar-nav {
+                padding: 20px 0;
+            }
+            .nav-section {
+                margin-bottom: 30px;
+            }
+            .nav-section-title {
+                padding: 0 20px 10px;
+                font-size: 12px;
+                font-weight: 700;
+                text-transform: uppercase;
+                color: #2563eb !important;
+                letter-spacing: 1px;
+                background: none !important;
+                background-color: transparent !important;
+            }
+            .nav-item {
+                display: block;
+                padding: 12px 20px;
+                color: #fff;
+                text-decoration: none;
+                transition: all 0.3s ease;
+                border-left: 3px solid transparent;
+                font-weight: 500;
+                background: transparent;
+            }
+            .nav-item:hover, .nav-item.active {
+                background: #35363a;
+                border-left-color: #2563eb;
+                color: #2563eb;
+                text-decoration: none;
+            }
+            .nav-item i {
+                width: 20px;
+                margin-right: 10px;
+                color: #2563eb;
+            }
+            /* Main Content */
+            .main-content {
+                flex: 1;
+                margin-left: 280px;
+                background: #f8f9fa;
+                min-height: 100vh;
+            }
+            .top-bar {
+                background: white;
+                padding: 15px 30px;
+                border-bottom: 1px solid #e9ecef;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .page-title {
+                font-size: 24px;
+                font-weight: 700;
+                color: #232526;
+                margin: 0;
+            }
+            .content-area {
+                padding: 30px;
+            }
+            .action-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 20px;
+                margin-bottom: 30px;
+            }
+            .action-card {
+                background: #fff;
+                border-radius: 10px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+                overflow: hidden;
+            }
+            .action-card-header {
+                background: #232b3e;
+                color: #fff;
+                padding: 20px;
+            }
+            .action-card-header h3 {
+                margin: 0;
+                font-size: 18px;
+                font-weight: 600;
+                color: #fff;
+            }
+            .action-card-body {
+                padding: 20px;
+                color: #444;
+            }
+            .action-btn {
+                display: block;
+                width: 100%;
+                padding: 12px 20px;
+                margin-bottom: 10px;
+                border: none;
+                border-radius: 5px;
+                text-decoration: none;
+                text-align: center;
+                font-weight: 600;
+                transition: all 0.3s ease;
+            }
+            .action-btn-primary {
+                background: #2563eb;
+                color: #fff;
+            }
+            .action-btn-primary:hover {
+                background: #1749b1;
+                color: #fff;
+                text-decoration: none;
+            }
+            .action-btn-secondary {
+                background: #2563eb !important;
+                color: #fff !important;
+                border: 1.5px solid #1749b1 !important;
+                font-weight: 600;
+                box-shadow: none;
+            }
+            .action-btn-secondary:hover {
+                background: #1749b1 !important;
+                color: #fff !important;
+                border-color: #1749b1 !important;
+                text-decoration: none;
+            }
+            .ai-match-section {
+                background: #232b3e;
+                color: #fff;
+                border-radius: 10px;
+                padding: 30px;
+                text-align: center;
+                box-shadow: 0 4px 20px rgba(35, 43, 62, 0.10);
+                margin-bottom: 30px;
+            }
+            .ai-match-section h3 {
+                margin: 0 0 15px 0;
+                font-size: 24px;
+                font-weight: 700;
+                color: #fff;
+            }
+            .ai-match-section p {
+                margin: 0 0 25px 0;
+                opacity: 0.95;
+                color: #e0e6ed;
+            }
+            .ai-match-btn {
+                background: #2563eb;
+                color: #fff;
+                padding: 15px 30px;
+                border: none;
+                border-radius: 25px;
+                font-size: 16px;
+                font-weight: 600;
+                text-decoration: none;
+                transition: all 0.3s ease;
+                display: inline-block;
+            }
+            .ai-match-btn:hover {
+                background: #1749b1;
+                color: #fff;
+                text-decoration: none;
+                transform: translateY(-2px);
+            }
+            .search-section {
+                background: #fff;
+                border-radius: 10px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+                padding: 25px;
+                margin-bottom: 30px;
+            }
+            .search-section h3 {
+                margin: 0 0 20px 0;
+                color: #232b3e;
+                font-weight: 700;
+            }
+            .search-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 20px;
+            }
+            .search-form {
+                background: #f8f9fa;
+                padding: 20px;
+                border-radius: 8px;
+            }
+            .search-form h5 {
+                color: #232b3e;
+                font-weight: 700;
+            }
+            .search-form input {
+                margin-bottom: 15px;
+            }
+            .search-results {
+                margin-top: 20px;
+                padding: 15px;
+                background: #f8f9fa;
+                border-radius: 5px;
+                border-left: 4px solid #2563eb;
+            }
+            .search-results p {
+                margin: 5px 0;
+                color: #232526;
+            }
+            @media (max-width: 768px) {
+                .sidebar {
+                    transform: translateX(-100%);
+                    transition: transform 0.3s ease;
+                }
+                
+                .sidebar.open {
+                    transform: translateX(0);
+                }
+                
+                .main-content {
+                    margin-left: 0;
+                }
+                
+                .mobile-menu-btn {
+                    display: block;
+                }
+            }
+            
+            .mobile-menu-btn {
+                display: none;
+                background: none;
+                border: none;
+                font-size: 20px;
+                color: #232526;
+            }
+
+            .nav-section-title {
+                color: #2563eb !important;
+                font-weight: 700;
+                background: none !important;
+                background-color: transparent !important;
+                letter-spacing: 1px;
+            }
+        </style>
     </head>
 
     <body>
-        <!-- Navigation Bar -->
-        <header>
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-12">
-                        <nav>
-                            <a href="index.html"><img class="nav-logo" src="./images/Screenshot__14_-removebg-preview.png" alt="Organ Donation Platform"></a>
-                            <ul class="navbar-nav">
-                                <li>
-                                    <a class="nav-link" href="homepage.html"><i class="fas fa-home"></i> Homepage</a>
-                                </li>
-                            </ul>
-                        </nav>
+        <div class="dashboard-container">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <img src="./images/Screenshot__14_-removebg-preview.png" alt="Logo" class="sidebar-logo">
+                    <h4 class="sidebar-title">Organ Donation</h4>
+                    <p class="sidebar-subtitle">Platform Dashboard</p>
+                </div>
+                
+                <nav class="sidebar-nav">
+                    <div class="nav-section">
+                        <a href="#dashboard" class="nav-item active">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                        <a href="homepage.html" class="nav-item">
+                            <i class="fas fa-home"></i> Homepage
+                        </a>
+                    </div>
+                    
+                    <div class="nav-section">
+                        <div class="nav-section-title">DONOR MANAGEMENT</div>
+                        <a href="donor-registration.html" class="nav-item">
+                            <i class="fas fa-user-plus"></i> Register Donor
+                        </a>
+                        <a href="view-donors.html" class="nav-item">
+                            <i class="fas fa-users"></i> View Donors
+                        </a>
+                        <a href="donor-pledge.html" class="nav-item">
+                            <i class="fas fa-hand-holding-heart"></i> Make Pledge
+                        </a>
+                    </div>
+                    
+                    <div class="nav-section">
+                        <div class="nav-section-title">PATIENT MANAGEMENT</div>
+                        <a href="patient-registration.html" class="nav-item">
+                            <i class="fas fa-procedures"></i> Register Patient
+                        </a>
+                        <a href="view-patients.html" class="nav-item">
+                            <i class="fas fa-user-injured"></i> View Patients
+                        </a>
+                    </div>
+                    
+                    <div class="nav-section">
+                        <div class="nav-section-title">PLEDGE MANAGEMENT</div>
+                        <a href="verify-pledges.html" class="nav-item">
+                            <i class="fas fa-check-circle"></i> Verify Pledges
+                        </a>
+                        <a href="view-pledges.html" class="nav-item">
+                            <i class="fas fa-list"></i> View Pledges
+                        </a>
+                    </div>
+                    
+                    <div class="nav-section">
+                        <div class="nav-section-title">AI & MATCHING</div>
+                        <a href="transplant-matching.html" class="nav-item">
+                            <i class="fas fa-heartbeat"></i> AI Transplant Match
+                        </a>
+                    </div>
+                    
+                    <div class="nav-section">
+                        <div class="nav-section-title">INFORMATION</div>
+                        <a href="about-us.html" class="nav-item">
+                            <i class="fas fa-info-circle"></i> About Us
+                        </a>
+                        <a href="awareness.html" class="nav-item">
+                            <i class="fas fa-lightbulb"></i> Awareness
+                        </a>
+                        <a href="contact.html" class="nav-item">
+                            <i class="fas fa-envelope"></i> Contact
+                        </a>
+                    </div>
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <!-- Top Bar -->
+                <div class="top-bar">
+                    <div>
+                        <button class="mobile-menu-btn" onclick="toggleSidebar()">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <h1 class="page-title">Dashboard</h1>
                     </div>
                 </div>
-            </div>
-        </header>
-        <!-- End Navigation Bar -->
 
-        <!-- Main Dashboard Content -->
-            <main class="container py-5">    
-                <div class="row">
-                    <!-- Donor Actions -->
-                    <div class="col-lg-6 mb-4">
-                        <div class="card dashboard-card">
-                            <div class="card-header">
+                <!-- Content Area -->
+                <div class="content-area">
+                    <!-- Action Cards -->
+                    <div class="action-grid">
+                        <div class="action-card">
+                            <div class="action-card-header">
                                 <h3><i class="fas fa-user-plus"></i> Donor Actions</h3>
                             </div>
-                            <div class="card-body">
-                                <a href="donor-registration.html" class="btn btn-primary btn-block mb-2">Register Donor</a>
-                                <a href="view-donors.html" class="btn btn-secondary btn-block mb-2">View Donors</a>
+                            <div class="action-card-body">
+                                <a href="donor-registration.html" class="action-btn action-btn-primary">
+                                    <i class="fas fa-plus"></i> Register New Donor
+                                </a>
+                                <a href="view-donors.html" class="action-btn action-btn-secondary">
+                                    <i class="fas fa-eye"></i> View All Donors
+                                </a>
+                                <a href="donor-pledge.html" class="action-btn action-btn-secondary">
+                                    <i class="fas fa-heart"></i> Make Pledge
+                                </a>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Patient Actions -->
-                    <div class="col-lg-6 mb-4">
-                        <div class="card dashboard-card">
-                            <div class="card-header">
+                        <div class="action-card">
+                            <div class="action-card-header">
                                 <h3><i class="fas fa-procedures"></i> Patient Actions</h3>
                             </div>
-                            <div class="card-body">
-                                <a href="patient-registration.html" class="btn btn-primary btn-block mb-2">Register Patient</a>
-                                <a href="view-patients.html" class="btn btn-secondary btn-block mb-2">View Patients</a>
+                            <div class="action-card-body">
+                                <a href="patient-registration.html" class="action-btn action-btn-primary">
+                                    <i class="fas fa-plus"></i> Register New Patient
+                                </a>
+                                <a href="view-patients.html" class="action-btn action-btn-secondary">
+                                    <i class="fas fa-eye"></i> View All Patients
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="action-card">
+                            <div class="action-card-header">
+                                <h3><i class="fas fa-check-circle"></i> Pledge Management</h3>
+                            </div>
+                            <div class="action-card-body">
+                                <a href="verify-pledges.html" class="action-btn action-btn-primary">
+                                    <i class="fas fa-check"></i> Verify Pledges
+                                </a>
+                                <a href="view-pledges.html" class="action-btn action-btn-secondary">
+                                    <i class="fas fa-list"></i> View All Pledges
+                                </a>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="row">
-                    <!-- Pledge Actions -->
-                    <div class="col-12 mb-4">
-                        <div class="card dashboard-card">
-                            <div class="card-header">
-                                <h3><i class="fas fa-hand-holding-heart"></i> Pledge Actions</h3>
-                            </div>
-                            <div class="card-body text-center">
-                            <a href="verify-pledges.html" class="btn btn-info mx-2">Verify Pledges</a>
-                            <a href="view-pledges.html" class="btn btn-info mx-2">View Pledges</a>
-                            </div>
-                        </div>
+                    <!-- AI Transplant Match Section -->
+                    <div class="ai-match-section">
+                        <h3><i class="fas fa-robot"></i> AI-Powered Transplant Matching</h3>
+                        <p>Our advanced AI algorithm helps match donors with patients based on medical compatibility, urgency, and other critical factors.</p>
+                        <a href="transplant-matching.html" class="ai-match-btn">
+                            <i class="fas fa-heartbeat"></i> Start AI Matching
+                        </a>
                     </div>
-                </div>
 
-                <div class="row">
-                    <!-- Transplant Match -->
-                    <div class="col-12 mb-4">
-                        <div class="card dashboard-card text-center">
-                            <div class="card-body">
-                                <a href="transplant-matching.html" class="btn btn-success btn-lg btn-block"><i class="fas fa-heartbeat"></i> AI Transplant Match</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <!-- Search Donor -->
-                    <div class="col-lg-6 mb-4">
-                        <div class="card dashboard-card">
-                            <div class="card-header">
-                                <h3><i class="fas fa-search"></i> Search Donor</h3>
-                            </div>
-                            <div class="card-body">
-                                <div class="form-group">
+                    <!-- Search Section -->
+                    <div class="search-section">
+                        <h3><i class="fas fa-search"></i> Search Records</h3>
+                        <div class="search-grid">
+                            <div class="search-form">
+                                <h5><i class="fas fa-user"></i> Search Donor</h5>
                                 <input type="text" id="inputDonorSearch" class="form-control" placeholder="Enter Donor Medical ID or Name">
-                                </div>
-                                <button type="submit" class="btn btn-primary btn-block" onclick="App.search('Donor')">Search</button>
-                                <div class="details mt-3" id="donor-details">
+                                <button type="submit" class="btn btn-primary btn-block" onclick="App.search('Donor')">
+                                    <i class="fas fa-search"></i> Search Donor
+                                </button>
+                                <div class="search-results" id="donor-details" style="display: none;">
                                     <p id="getDonorFullName"></p>
                                     <p id="getDonorAge"></p>
                                     <p id="getDonorGender"></p>
@@ -118,21 +457,14 @@
                                     <p id="searchDonorCheck" class="text-center"></p>
                                 </div>
                             </div>
-                        </div>
-                    </div>
 
-                    <!-- Search Patient -->
-                    <div class="col-lg-6 mb-4">
-                        <div class="card dashboard-card">
-                            <div class="card-header">
-                                <h3><i class="fas fa-search"></i> Search Patient</h3>
-                            </div>
-                            <div class="card-body">
-                                <div class="form-group">
+                            <div class="search-form">
+                                <h5><i class="fas fa-user-injured"></i> Search Patient</h5>
                                 <input type="text" id="inputPatientSearch" class="form-control" placeholder="Enter Patient Medical ID or Name">
-                                </div>
-                                <button type="submit" class="btn btn-primary btn-block" onclick="App.search('Patient')">Search</button>
-                                <div class="details mt-3" id="patient-details">
+                                <button type="submit" class="btn btn-primary btn-block" onclick="App.search('Patient')">
+                                    <i class="fas fa-search"></i> Search Patient
+                                </button>
+                                <div class="search-results" id="patient-details" style="display: none;">
                                     <p id="getPatientFullName"></p>
                                     <p id="getPatientAge"></p>
                                     <p id="getPatientGender"></p>
@@ -146,18 +478,36 @@
                         </div>
                     </div>
                 </div>
-            </main>
-        <!-- End Main Dashboard Content -->
-
-        <!-- Footer -->
-                <footer class="text-center py-4">
-                    <p>&copy; 2024 Organ Donation Platform. All Rights Reserved.</p>
-                </footer>
-        <!-- End Footer -->
+            </div>
+        </div>
 
         <!-- Scripts -->
         <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        
+        <script>
+            // Mobile sidebar toggle
+            function toggleSidebar() {
+                const sidebar = document.querySelector('.sidebar');
+                sidebar.classList.toggle('open');
+            }
+            
+            // Show search results when data is available
+            function showSearchResults(type) {
+                const resultsDiv = document.getElementById(type + '-details');
+                if (resultsDiv) {
+                    resultsDiv.style.display = 'block';
+                }
+            }
+            
+            // Override the search function to show results
+            const originalSearch = App.search;
+            App.search = function(type) {
+                originalSearch.call(this, type);
+                setTimeout(() => showSearchResults(type.toLowerCase()), 1000);
+            };
+        </script>
     </body>
 </html>
+

@@ -53,6 +53,7 @@ module.exports = {
   devServer: { 
     contentBase: path.join(__dirname, "dist"), 
     compress: true,
-    index: "homepage.html"
+    index: "homepage.html",
+    port: 8081
   },
 };

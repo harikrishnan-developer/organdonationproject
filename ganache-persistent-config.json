@@ -1,0 +1,18 @@
+{
+  "server": {
+    "port": 7545,
+    "hostname": "127.0.0.1"
+  },
+  "database": {
+    "db_path": "./ganache-db",
+    "auto_mine": true
+  },
+  "chain": {
+    "network_id": 5777,
+    "total_accounts": 10,
+    "default_balance_ether": 100
+  },
+  "logging": {
+    "quiet": false
+  }
+} 
