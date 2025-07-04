@@ -123,6 +123,25 @@
                     <tbody></tbody>
                 </table>
             </div>
+        </div> <!-- End of table-responsive for AI Match Recommendations -->
+
+        <!-- Paste the IPFS retrieval section here: -->
+        <!-- Retrieve Transplant Match from IPFS -->
+        <h4 class="mt-5">Retrieve Transplant Match from IPFS</h4>
+        <div class="form-group">
+          <label for="ipfsRetrieveCid">IPFS CID</label>
+          <input type="text" id="ipfsRetrieveCid" class="form-control" placeholder="Enter CID">
+        </div>
+        <div class="form-group">
+          <label for="ipfsRetrievePassword">Password</label>
+          <input type="password" id="ipfsRetrievePassword" class="form-control" placeholder="Enter password used for encryption">
+        </div>
+        <button class="btn btn-primary mb-2" id="ipfsRetrieveBtn">Retrieve & Decrypt</button>
+        <div id="ipfsRetrieveError" class="text-danger mb-2"></div>
+        <pre id="ipfsRetrieveResult" style="background:#f8f9fa; padding:1em; border-radius:6px; min-height:2em;"></pre>
+        <button class="btn btn-outline-success mb-3" id="ipfsDownloadPdfBtn" style="display:none;">Download as PDF</button>
+        <button class="btn btn-outline-primary mb-3" id="ipfsVerifyBtn" style="display:none;">Verify Match</button>
+        <span id="ipfsVerifiedBadge" class="badge bg-success" style="display:none;">Verified</span>
         </div>
     </div>
     <div id="accessDenied" class="container py-5 text-center" style="display:none;">
@@ -469,5 +488,132 @@ if (typeof App !== 'undefined' && App.accounts && App.accounts[0] && App.account
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script>
+    document.getElementById('ipfsRetrieveBtn').onclick = async function() {
+        const cid = document.getElementById('ipfsRetrieveCid').value.trim();
+        const password = document.getElementById('ipfsRetrievePassword').value;
+        const errorDiv = document.getElementById('ipfsRetrieveError');
+        const resultPre = document.getElementById('ipfsRetrieveResult');
+        const downloadBtn = document.getElementById('ipfsDownloadPdfBtn');
+        errorDiv.textContent = '';
+        resultPre.textContent = '';
+        downloadBtn.style.display = 'none';
+        window.lastDecryptedMatch = null;
+        window.lastMatchVerified = false;
+        if (!cid || !password) {
+            errorDiv.textContent = 'Please enter both CID and password.';
+            return;
+        }
+        try {
+            // Fetch encrypted data from IPFS gateway
+            const url = `https://gateway.pinata.cloud/ipfs/${cid}`;
+            const response = await axios.get(url);
+            const encrypted = response.data;
+            // Decrypt using CryptoJS (HEX, not Base64)
+            const iv = CryptoJS.enc.Hex.parse(encrypted.iv);
+            const key = CryptoJS.PBKDF2(password, CryptoJS.enc.Utf8.parse('salt'), { keySize: 256/32 });
+            const decrypted = CryptoJS.AES.decrypt(
+                { ciphertext: CryptoJS.enc.Hex.parse(encrypted.data) },
+                key,
+                {
+                    iv: iv,
+                    mode: CryptoJS.mode.CBC,
+                    padding: CryptoJS.pad.Pkcs7
+                }
+            );
+            const plaintext = decrypted.toString(CryptoJS.enc.Utf8);
+            if (!plaintext) throw new Error('Incorrect password or corrupted data.');
+            // Pretty print JSON if possible
+            try {
+                const obj = JSON.parse(plaintext);
+                resultPre.textContent = JSON.stringify(obj, null, 2);
+                window.lastDecryptedMatch = obj;
+                window.lastMatchVerified = false;
+                downloadBtn.style.display = 'inline-block';
+document.getElementById('ipfsVerifyBtn').style.display = 'inline-block';
+document.getElementById('ipfsVerifiedBadge').style.display = 'none';
+                downloadBtn.style.display = 'inline-block';
+            } catch {
+                resultPre.textContent = plaintext;
+            }
+        } catch (err) {
+            errorDiv.textContent = 'Failed to retrieve or decrypt: ' + (err.message || err);
+        }
+    };
+    
+    // PDF download logic
+    document.getElementById('ipfsDownloadPdfBtn').onclick = function() {
+        const match = window.lastDecryptedMatch;
+        if (!match) return;
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+    
+        // Title and description
+        doc.setFontSize(18);
+        doc.text('Organ Donation Match Result', 14, 18);
+        doc.setFontSize(12);
+        doc.text('This report details a successful AI-powered organ transplant match. Organ donation saves lives by providing critical organs to patients in need. This match was generated using advanced compatibility algorithms.', 14, 28, { maxWidth: 180 });
+    
+      
+    
+        // Table data
+        const tableBody = [
+            ['Patient Name', match.patient.name],
+            ['Patient Age', match.patient.age],
+            ['Patient Gender', match.patient.gender],
+            ['Patient Blood Type', match.patient.bloodType],
+            ['Patient Organ(s)', (Array.isArray(match.patient.organs) ? match.patient.organs.join(', ') : match.patient.organs)],
+            ['Donor Name', match.donor.name],
+            ['Donor Age', match.donor.age],
+            ['Donor Gender', match.donor.gender],
+            ['Donor Blood Type', match.donor.bloodType],
+            ['Donor Organ(s)', (Array.isArray(match.donor.organs) ? match.donor.organs.join(', ') : match.donor.organs)],
+            ['Matched Organ', match.organ],
+            ['AI Score', match.aiScore.toFixed(3)],
+            ['Basic Compatibility', match.basicCompatibility],
+            ['Combined Score', match.combinedScore.toFixed(3)]
+        ];
+    
+        doc.autoTable({
+    startY: 45,
+    head: [['Field', 'Value']],
+    body: tableBody,
+    theme: 'grid',
+    styles: { fontSize: 11 }
+});
+if (window.lastMatchVerified) {
+    doc.setFontSize(14);
+    doc.setTextColor(0, 128, 0); // Green
+    // Place below the table
+    const finalY = doc.lastAutoTable.finalY || 45;
+    doc.text('✔ Verified by Admin', 14, finalY + 15);
+    doc.setTextColor(0, 0, 0); // Reset to black
+}
+        // Footer
+        doc.setFontSize(10);
+        doc.text('Generated by Organ Donation Platform', 14, doc.internal.pageSize.getHeight() - 10);
+    
+        doc.save(`organ_match_${match.patient.name}_${match.donor.name}.pdf`);
+        
+    };
+    document.getElementById('ipfsVerifyBtn').onclick = function() {
+    document.getElementById('ipfsVerifiedBadge').style.display = 'inline-block';
+    this.disabled = true;
+    this.textContent = 'Verified';
+    window.lastMatchVerified = true; // <-- Add this line here (likely line 604)
+};
+
+    </script>
+    <script>
+    document.getElementById('aiMatchesTable').parentElement.style.display = 'none';
+    // Optionally hide the heading and download button too:
+    document.querySelector('h4').style.display = 'none';
+    document.querySelector('button[onclick="downloadDetailedAIMatchReport()"]').style.display = 'none';
+    
+</script>
 </body>
 </html> 

@@ -11,6 +11,14 @@ const contractAddress = deployedContract.address;
 
 const MIN_GAS = 1000000;
 
+// Add SHA-256 hash function using jsSHA
+function sha256(str) {
+    str = String(str); // Ensure input is a string
+    var shaObj = new jsSHA("SHA-256", "TEXT");
+    shaObj.update(str);
+    return shaObj.getHash("HEX");
+}
+
 function generateTableHead(table, data) {
     let thead = table.createTHead();
     let row = thead.insertRow();
@@ -119,8 +127,8 @@ function assignSearchValues(result, user){
     document.getElementById("get"+user+"FullName").innerHTML = "Full Name: " + result[0];
     document.getElementById("get"+user+"Age").innerHTML = "Age: " + result[1];
     document.getElementById("get"+user+"Gender").innerHTML = "Gender: " + result[2];
-    document.getElementById("get"+user+"BloodType").innerHTML = "Blood Type: " + result[3];
-    document.getElementById("get"+user+"Organ").innerHTML = "Organ: " + result[4];
+    document.getElementById("get"+user+"BloodType").innerHTML = "Blood Type SHA256: " + sha256(result[3]);
+    document.getElementById("get"+user+"Organ").innerHTML = "Organ SHA256: " + sha256(Array.isArray(result[4]) ? result[4].join(',') : result[4]);
     document.getElementById("get"+user+"Weight").innerHTML = "Weight: " + result[5];
     document.getElementById("get"+user+"Height").innerHTML = "Height: " + result[6];
 }
@@ -435,20 +443,28 @@ const App = {
             }
             // result[0] is fullname
             if (result[0] && result[0].toLowerCase() === input.toLowerCase()) {
-                matches.push(result);
+                // Hash blood type and organ for demonstration
+                const bloodTypeHash = sha256(result[3]);
+                const organHash = sha256(Array.isArray(result[4]) ? result[4].join(',') : result[4]);
+                matches.push({
+                    result: result,
+                    bloodTypeHash: bloodTypeHash,
+                    organHash: organHash
+                });
             }
         }
         if (matches.length > 0) {
             // Show all matches as a list
             let html = '';
-            matches.forEach((result, idx) => {
+            matches.forEach((match, idx) => {
+                const result = match.result;
                 html += `<div class='border rounded p-2 mb-2'>` +
                     `<strong>Match ${idx+1}</strong><br>` +
                     `Full Name: ${result[0]}<br>` +
                     `Age: ${result[1]}<br>` +
                     `Gender: ${result[2]}<br>` +
-                    `Blood Type: ${result[3]}<br>` +
-                    `Organ: ${result[4]}<br>` +
+                    `Blood Type SHA256: ${match.bloodTypeHash}<br>` +
+                    `Organ SHA256: ${match.organHash}<br>` +
                     `Weight: ${result[5]}<br>` +
                     `Height: ${result[6]}` +
                     `</div>`;
@@ -791,7 +807,11 @@ const App = {
                 // Determine match quality color
                 let qualityClass = '';
                 let qualityText = '';
-                if (rec.combinedScore >= 0.8) {
+                // Check blood compatibility first
+                if (rec.basicCompatibility === 0) {
+                    qualityClass = 'text-danger';
+                    qualityText = 'Incompatible';
+                } else if (rec.combinedScore >= 0.8) {
                     qualityClass = 'text-success';
                     qualityText = 'Excellent';
                 } else if (rec.combinedScore >= 0.6) {
@@ -821,11 +841,15 @@ const App = {
                     <td>${rec.donor.age}</td>
                     <td><span class="badge badge-secondary">${rec.donor.bloodType}</span></td>
                     <td><span class="${qualityClass}"><strong>${qualityText}</strong></span></td>
+                    <td><button class='btn btn-outline-success btn-sm' onclick='uploadMatchToIPFS(${index})'>Save to IPFS</button></td>
                 `;
             });
         } else {
             table.innerHTML = '<tr><td colspan="12" class="text-center text-muted">No matches found</td></tr>';
         }
+
+        // Store recommendations globally for access by uploadMatchToIPFS
+        window.currentRecommendations = recommendations;
 
         // Generate AI insights
         this.generateAIInsights(recommendations, patients, donors, aiMatcher);
@@ -904,4 +928,39 @@ window.addEventListener("load", function() {
     );
 
   App.start();
+});
+
+// Use modal for password input instead of prompt
+let pendingMatchIndex = null;
+
+window.uploadMatchToIPFS = function(matchIndex) {
+    pendingMatchIndex = matchIndex;
+    document.getElementById('ipfsPasswordInput').value = '';
+    document.getElementById('ipfsPasswordError').textContent = '';
+    document.getElementById('ipfsPasswordModal').style.display = 'flex';
+};
+
+// Attach handler for modal submit
+window.addEventListener('DOMContentLoaded', function() {
+    const submitBtn = document.getElementById('ipfsPasswordSubmit');
+    if (submitBtn) {
+        submitBtn.onclick = async function() {
+            const password = document.getElementById('ipfsPasswordInput').value;
+            if (!password) {
+                document.getElementById('ipfsPasswordError').textContent = 'Password is required!';
+                return;
+            }
+            document.getElementById('ipfsPasswordModal').style.display = 'none';
+            const match = window.currentRecommendations[pendingMatchIndex];
+            try {
+                const cid = await window.uploadMatchResultToIPFS(match, password);
+                document.getElementById('lastIpfsCid').innerHTML =
+                  'Last uploaded CID: <code>' + cid + '</code> ' +
+                  '<button class="btn btn-outline-primary btn-sm" onclick="navigator.clipboard.writeText(\'' + cid + '\')">Copy</button>';
+                alert('Match result uploaded to IPFS!\nCID: ' + cid);
+            } catch (err) {
+                alert('Failed to upload to IPFS: ' + err.message);
+            }
+        };
+    }
 });
