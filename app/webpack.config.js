@@ -54,6 +54,6 @@ module.exports = {
     contentBase: path.join(__dirname, "dist"), 
     compress: true,
     index: "homepage.html",
-    port: 8081
+    port: 9000
   },
 };

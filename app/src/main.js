@@ -807,30 +807,6 @@ const App = {
 
                 // Determine organ label/icon
                 let organLabel = rec.organ;
-                switch (rec.organ.toLowerCase()) {
-                    case 'heart':
-                        organLabel = '❤️ Heart';
-                        break;
-                    case 'liver':
-                        organLabel = 'Liver';
-                        break;
-                    case 'left lung':
-                    case 'right lung':
-                        organLabel = '🫁 ' + rec.organ.charAt(0).toUpperCase() + rec.organ.slice(1);
-                        break;
-                    case 'left kidney':
-                    case 'right kidney':
-                        organLabel = '🫘 ' + rec.organ.charAt(0).toUpperCase() + rec.organ.slice(1);
-                        break;
-                    case 'pancreas':
-                        organLabel = 'Pancreas';
-                        break;
-                    case 'intestine':
-                        organLabel = 'Intestine';
-                        break;
-                    default:
-                        organLabel = rec.organ;
-                }
 
                 row.innerHTML = `
                     <td><strong>${index + 1}</strong></td>
@@ -906,7 +882,7 @@ const App = {
             </div>
             <div class="row mt-3">
                 <div class="col-md-12">
-                    <h6>⭐ Top Recommendation</h6>
+                    <h6>Top Result</h6>
                     <div class="alert alert-success">
                         <strong>${bestMatch.patient.name}</strong> (${bestMatch.patient.bloodType}) 
                         needs a <strong>${bestMatch.organ}</strong> and matches with 

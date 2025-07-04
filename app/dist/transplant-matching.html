@@ -138,10 +138,10 @@
         </body>
 
 
-    <script src="../js/ai-matching.js"></script>
-    <script src="../main.js"></script>
+    <script src="../js/ai-matching.js" defer></script>
+    <script src="../main.js" defer></script>
     <script>
-        window.onload = App.enhancedTransplantMatch();
+        window.onload = function() { App.enhancedTransplantMatch(); };
     </script>
     <button onclick="window.history.back()" class="btn btn-secondary mt-3 ml-3">← Back</button>
 </html>
