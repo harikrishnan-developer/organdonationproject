@@ -15,12 +15,158 @@
         <link rel="icon" href="images/organ-donation-logo-new.svg">
 
         <script src="../main.js"></script>
+        
+        <style>
+            body {
+                background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important;
+                min-height: 100vh;
+                font-family: 'Montserrat', sans-serif;
+            }
+            
+            .header-section {
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(10px);
+                box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            }
+            
+            .main-content {
+                background: rgba(255, 255, 255, 0.9);
+                border-radius: 20px;
+                box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+                backdrop-filter: blur(10px);
+                margin: 20px auto;
+                padding: 30px;
+                max-width: 1200px;
+            }
+            
+            .card {
+                border: none;
+                border-radius: 15px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+                overflow: hidden;
+            }
+            
+            .card-header {
+                background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important;
+                border: none;
+                padding: 25px;
+            }
+            
+            .form-control, .form-select {
+                border-radius: 10px;
+                border: 2px solid #e9ecef;
+                padding: 12px 15px;
+                transition: all 0.3s ease;
+            }
+            
+            .form-control:focus, .form-select:focus {
+                border-color: #11998e;
+                box-shadow: 0 0 0 0.2rem rgba(17, 153, 142, 0.25);
+            }
+            
+            .btn-primary {
+                background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+                border: none;
+                border-radius: 10px;
+                padding: 12px 30px;
+                font-weight: 600;
+                transition: all 0.3s ease;
+            }
+            
+            .btn-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(17, 153, 142, 0.4);
+            }
+            
+            .btn-secondary {
+                background: rgba(255, 255, 255, 0.9);
+                border: 2px solid #11998e;
+                color: #11998e;
+                border-radius: 10px;
+                padding: 10px 20px;
+                font-weight: 600;
+                transition: all 0.3s ease;
+            }
+            
+            .btn-secondary:hover {
+                background: #11998e;
+                color: white;
+                transform: translateY(-2px);
+            }
+            
+            .form-check-input:checked {
+                background-color: #11998e;
+                border-color: #11998e;
+            }
+            
+            .alert {
+                border-radius: 10px;
+                border: none;
+            }
+            
+            .alert-success {
+                background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+                color: white;
+            }
+            
+            .floating-elements {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                z-index: -1;
+            }
+            
+            .float-card {
+                position: absolute;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 15px;
+                backdrop-filter: blur(5px);
+                animation: float 6s ease-in-out infinite;
+            }
+            
+            .card-1 {
+                top: 15%;
+                right: 5%;
+                width: 100px;
+                height: 100px;
+                animation-delay: 0s;
+            }
+            
+            .card-2 {
+                top: 70%;
+                left: 10%;
+                width: 80px;
+                height: 80px;
+                animation-delay: 2s;
+            }
+            
+            .card-3 {
+                bottom: 15%;
+                right: 15%;
+                width: 120px;
+                height: 120px;
+                animation-delay: 4s;
+            }
+            
+            @keyframes float {
+                0%, 100% { transform: translateY(0px); }
+                50% { transform: translateY(-20px); }
+            }
+        </style>
+        
         <title>Patient Registration</title>
     </head>
 
     <body>
+        <div class="floating-elements">
+            <div class="float-card card-1"></div>
+            <div class="float-card card-2"></div>
+            <div class="float-card card-3"></div>
+        </div>
+        
     <!-- start of navigation-->
-        <header>
+        <header class="header-section">
             <div class="container">
                 <div class="row">
                     <div class="col-12">
@@ -34,7 +180,7 @@
         <!-- end of navigation-->
         
         
-        <main>        
+        <main class="main-content">        
             <div class="container py-5 text-center">
                 <button id="connectWalletBtn" class="btn btn-primary btn-lg" onclick="App.connect()">Connect with MetaMask</button>
                 <div id="walletInfo" class="alert alert-success mt-3" style="display:none;"></div>
@@ -50,36 +196,36 @@
                                 <div class="card-body">
                                 <form>
                                         <div class="mb-3">
-                                            <label for="PatientFullName" class="form-label">Full Name</label>
+                                            <label for="PatientFullName" class="form-label fw-bold">Full Name</label>
                                             <input type="text" class="form-control" id="PatientFullName" placeholder="Full name">
                                         </div>
                                         <div class="mb-3">
-                                            <label for="PatientAge" class="form-label">Age</label>
+                                            <label for="PatientAge" class="form-label fw-bold">Age</label>
                                             <input type="number" class="form-control" id="PatientAge" placeholder="Age" min="0">
                                         </div>
                                         <div class="mb-3">
-                                            <label class="form-label">Gender</label>
+                                            <label class="form-label fw-bold">Gender</label>
                                             <div>
                                                 <div class="form-check form-check-inline">
                                                     <input class="form-check-input" type="radio" name="gender" id="patientGenderMale" value="Male">
-                                                    <label class="form-check-label" for="patientGenderMale">Male</label>
+                                                    <label class="form-check-label fw-bold" for="patientGenderMale">Male</label>
                                                 </div>
                                                 <div class="form-check form-check-inline">
                                                     <input class="form-check-input" type="radio" name="gender" id="patientGenderFemale" value="Female">
-                                                    <label class="form-check-label" for="patientGenderFemale">Female</label>
+                                                    <label class="form-check-label fw-bold" for="patientGenderFemale">Female</label>
                                                 </div>
                                                 <div class="form-check form-check-inline">
                                                     <input class="form-check-input" type="radio" name="gender" id="patientGenderOther" value="Others">
-                                                    <label class="form-check-label" for="patientGenderOther">Others</label>
+                                                    <label class="form-check-label fw-bold" for="patientGenderOther">Others</label>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="mb-3">
-                                            <label for="PatientMedicalID" class="form-label">Medical ID</label>
+                                            <label for="PatientMedicalID" class="form-label fw-bold">Medical ID</label>
                                             <input type="text" class="form-control" id="PatientMedicalID" placeholder="Patient Medical ID">
                                         </div>
                                         <div class="mb-3">
-                                            <label for="PatientBloodType" class="form-label">Blood Type</label>
+                                            <label for="PatientBloodType" class="form-label fw-bold">Blood Type</label>
                                             <select class="form-select" id="PatientBloodType">
                                                 <option value="">Select blood type</option>
                                     <option value="A-">A-</option>
@@ -93,54 +239,54 @@
                                     </select>
                                         </div>
                                         <div class="mb-3">
-                                            <label class="form-label">Organ(s) Needed</label>
+                                            <label class="form-label fw-bold">Organ(s) Needed</label>
                                             <div class="row">
                                                 <div class="col-6 col-md-4">
                                                     <div class="form-check">
                                                         <input class="form-check-input" type="checkbox" name="Organ" id="patientOrganLeftKidney" value="Left Kidney">
-                                                        <label class="form-check-label" for="patientOrganLeftKidney">Left Kidney</label>
+                                                        <label class="form-check-label fw-bold" for="patientOrganLeftKidney">Left Kidney</label>
                                                     </div>
                                                     <div class="form-check">
                                                         <input class="form-check-input" type="checkbox" name="Organ" id="patientOrganRightKidney" value="Right Kidney">
-                                                        <label class="form-check-label" for="patientOrganRightKidney">Right Kidney</label>
+                                                        <label class="form-check-label fw-bold" for="patientOrganRightKidney">Right Kidney</label>
                                                     </div>
                                                     <div class="form-check">
                                                         <input class="form-check-input" type="checkbox" name="Organ" id="patientOrganLeftLung" value="Left Lung">
-                                                        <label class="form-check-label" for="patientOrganLeftLung">Left Lung</label>
+                                                        <label class="form-check-label fw-bold" for="patientOrganLeftLung">Left Lung</label>
                                                     </div>
                                                 </div>
                                                 <div class="col-6 col-md-4">
                                                     <div class="form-check">
                                                         <input class="form-check-input" type="checkbox" name="Organ" id="patientOrganRightLung" value="Right Lung">
-                                                        <label class="form-check-label" for="patientOrganRightLung">Right Lung</label>
+                                                        <label class="form-check-label fw-bold" for="patientOrganRightLung">Right Lung</label>
                                                     </div>
                                                     <div class="form-check">
                                                         <input class="form-check-input" type="checkbox" name="Organ" id="patientOrganLiver" value="Liver">
-                                                        <label class="form-check-label" for="patientOrganLiver">Liver</label>
+                                                        <label class="form-check-label fw-bold" for="patientOrganLiver">Liver</label>
                                                     </div>
                                                     <div class="form-check">
                                                         <input class="form-check-input" type="checkbox" name="Organ" id="patientOrganHeart" value="Heart">
-                                                        <label class="form-check-label" for="patientOrganHeart">Heart</label>
+                                                        <label class="form-check-label fw-bold" for="patientOrganHeart">Heart</label>
                                                     </div>
                                                 </div>
                                                 <div class="col-12 col-md-4">
                                                     <div class="form-check">
                                                         <input class="form-check-input" type="checkbox" name="Organ" id="patientOrganPancreas" value="Pancreas">
-                                                        <label class="form-check-label" for="patientOrganPancreas">Pancreas</label>
+                                                        <label class="form-check-label fw-bold" for="patientOrganPancreas">Pancreas</label>
                                                     </div>
                                                     <div class="form-check">
                                                         <input class="form-check-input" type="checkbox" name="Organ" id="patientOrganIntestine" value="Intestine">
-                                                        <label class="form-check-label" for="patientOrganIntestine">Intestine</label>
+                                                        <label class="form-check-label fw-bold" for="patientOrganIntestine">Intestine</label>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="mb-3">
-                                            <label for="PatientWeight" class="form-label">Weight (kg)</label>
+                                            <label for="PatientWeight" class="form-label fw-bold">Weight (kg)</label>
                                             <input type="number" class="form-control" id="PatientWeight" placeholder="Weight" min="0">
                                         </div>
                                         <div class="mb-3">
-                                            <label for="PatientHeight" class="form-label">Height (cm)</label>
+                                            <label for="PatientHeight" class="form-label fw-bold">Height (cm)</label>
                                             <input type="number" class="form-control" id="PatientHeight" placeholder="Height" min="0">
                                         </div>
                                         <div class="d-grid gap-2">

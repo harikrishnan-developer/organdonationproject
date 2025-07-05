@@ -14,12 +14,157 @@
         <link rel="icon" href="images/organ-donation-logo-new.svg">
         <script src="../main.js"></script>
 
+        <style>
+            body {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+                min-height: 100vh;
+                font-family: 'Montserrat', sans-serif;
+            }
+            
+            .header-section {
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(10px);
+                box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            }
+            
+            .main-content {
+                background: rgba(255, 255, 255, 0.9);
+                border-radius: 20px;
+                box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+                backdrop-filter: blur(10px);
+                margin: 20px auto;
+                padding: 30px;
+                max-width: 1200px;
+            }
+            
+            .card {
+                border: none;
+                border-radius: 15px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+                overflow: hidden;
+            }
+            
+            .card-header {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+                border: none;
+                padding: 25px;
+            }
+            
+            .form-control, .form-select {
+                border-radius: 10px;
+                border: 2px solid #e9ecef;
+                padding: 12px 15px;
+                transition: all 0.3s ease;
+            }
+            
+            .form-control:focus, .form-select:focus {
+                border-color: #667eea;
+                box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            }
+            
+            .btn-primary {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                border: none;
+                border-radius: 10px;
+                padding: 12px 30px;
+                font-weight: 600;
+                transition: all 0.3s ease;
+            }
+            
+            .btn-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            }
+            
+            .btn-secondary {
+                background: rgba(255, 255, 255, 0.9);
+                border: 2px solid #667eea;
+                color: #667eea;
+                border-radius: 10px;
+                padding: 10px 20px;
+                font-weight: 600;
+                transition: all 0.3s ease;
+            }
+            
+            .btn-secondary:hover {
+                background: #667eea;
+                color: white;
+                transform: translateY(-2px);
+            }
+            
+            .form-check-input:checked {
+                background-color: #667eea;
+                border-color: #667eea;
+            }
+            
+            .alert {
+                border-radius: 10px;
+                border: none;
+            }
+            
+            .alert-success {
+                background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+                color: white;
+            }
+            
+            .floating-elements {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                z-index: -1;
+            }
+            
+            .float-card {
+                position: absolute;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 15px;
+                backdrop-filter: blur(5px);
+                animation: float 6s ease-in-out infinite;
+            }
+            
+            .card-1 {
+                top: 10%;
+                left: 5%;
+                width: 100px;
+                height: 100px;
+                animation-delay: 0s;
+            }
+            
+            .card-2 {
+                top: 60%;
+                right: 10%;
+                width: 80px;
+                height: 80px;
+                animation-delay: 2s;
+            }
+            
+            .card-3 {
+                bottom: 20%;
+                left: 15%;
+                width: 120px;
+                height: 120px;
+                animation-delay: 4s;
+            }
+            
+            @keyframes float {
+                0%, 100% { transform: translateY(0px); }
+                50% { transform: translateY(-20px); }
+            }
+        </style>
+
         <title>Donor Registration</title>
     </head>
 
     <body>
+        <div class="floating-elements">
+            <div class="float-card card-1"></div>
+            <div class="float-card card-2"></div>
+            <div class="float-card card-3"></div>
+        </div>
+        
     <!-- start of navigation-->
-    <header>
+    <header class="header-section">
         <div class="container">
             <div class="row">
                 <div class="col-12">
@@ -35,7 +180,7 @@
     <button onclick="window.history.back()" class="btn btn-secondary mt-3 ml-3">← Back</button>
 
            
-            <main>
+            <main class="main-content">
                 <div class="container py-5 text-center">
                     <button id="connectWalletBtn" class="btn btn-primary btn-lg" onclick="App.connect()">Connect with MetaMask</button>
                     <div id="walletInfo" class="alert alert-success mt-3" style="display:none;"></div>
@@ -51,36 +196,36 @@
                                     <div class="card-body">
                                 <form>
                                             <div class="mb-3">
-                                                <label for="DonorFullName" class="form-label">Full Name</label>
+                                                <label for="DonorFullName" class="form-label fw-bold">Full Name</label>
                                                 <input type="text" class="form-control" id="DonorFullName" placeholder="Full name">
                                             </div>
                                             <div class="mb-3">
-                                                <label for="DonorAge" class="form-label">Age</label>
+                                                <label for="DonorAge" class="form-label fw-bold">Age</label>
                                                 <input type="number" class="form-control" id="DonorAge" placeholder="Age" min="0">
                                             </div>
                                             <div class="mb-3">
-                                                <label class="form-label">Gender</label>
+                                                <label class="form-label fw-bold">Gender</label>
                                                 <div>
                                                     <div class="form-check form-check-inline">
                                                         <input class="form-check-input" type="radio" name="gender" id="donorGenderMale" value="Male">
-                                                        <label class="form-check-label" for="donorGenderMale">Male</label>
+                                                        <label class="form-check-label fw-bold" for="donorGenderMale">Male</label>
                                                     </div>
                                                     <div class="form-check form-check-inline">
                                                         <input class="form-check-input" type="radio" name="gender" id="donorGenderFemale" value="Female">
-                                                        <label class="form-check-label" for="donorGenderFemale">Female</label>
+                                                        <label class="form-check-label fw-bold" for="donorGenderFemale">Female</label>
                                                     </div>
                                                     <div class="form-check form-check-inline">
                                                         <input class="form-check-input" type="radio" name="gender" id="donorGenderOther" value="Others">
-                                                        <label class="form-check-label" for="donorGenderOther">Others</label>
+                                                        <label class="form-check-label fw-bold" for="donorGenderOther">Others</label>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="mb-3">
-                                                <label for="DonorMedicalID" class="form-label">Medical ID</label>
+                                                <label for="DonorMedicalID" class="form-label fw-bold">Medical ID</label>
                                                 <input type="text" class="form-control" id="DonorMedicalID" placeholder="Donor Medical ID">
                                             </div>
                                             <div class="mb-3">
-                                                <label for="DonorBloodType" class="form-label">Blood Type</label>
+                                                <label for="DonorBloodType" class="form-label fw-bold">Blood Type</label>
                                                 <select class="form-select" id="DonorBloodType">
                                                     <option value="">Select blood type</option>
                                         <option value="A-">A-</option>
@@ -94,54 +239,54 @@
                                         </select>
                                             </div>
                                             <div class="mb-3">
-                                                <label class="form-label">Organ(s) to Donate</label>
+                                                <label class="form-label fw-bold">Organ(s) to Donate</label>
                                                 <div class="row">
                                                     <div class="col-6 col-md-4">
                                                         <div class="form-check">
                                                             <input class="form-check-input" type="checkbox" name="Organ" id="organLeftKidney" value="Left Kidney">
-                                                            <label class="form-check-label" for="organLeftKidney">Left Kidney</label>
+                                                            <label class="form-check-label fw-bold" for="organLeftKidney">Left Kidney</label>
                                                         </div>
                                                         <div class="form-check">
                                                             <input class="form-check-input" type="checkbox" name="Organ" id="organRightKidney" value="Right Kidney">
-                                                            <label class="form-check-label" for="organRightKidney">Right Kidney</label>
+                                                            <label class="form-check-label fw-bold" for="organRightKidney">Right Kidney</label>
                                                         </div>
                                                         <div class="form-check">
                                                             <input class="form-check-input" type="checkbox" name="Organ" id="organLeftLung" value="Left Lung">
-                                                            <label class="form-check-label" for="organLeftLung">Left Lung</label>
+                                                            <label class="form-check-label fw-bold" for="organLeftLung">Left Lung</label>
                                                         </div>
                                                     </div>
                                                     <div class="col-6 col-md-4">
                                                         <div class="form-check">
                                                             <input class="form-check-input" type="checkbox" name="Organ" id="organRightLung" value="Right Lung">
-                                                            <label class="form-check-label" for="organRightLung">Right Lung</label>
+                                                            <label class="form-check-label fw-bold" for="organRightLung">Right Lung</label>
                                                         </div>
                                                         <div class="form-check">
                                                             <input class="form-check-input" type="checkbox" name="Organ" id="organLiver" value="Liver">
-                                                            <label class="form-check-label" for="organLiver">Liver</label>
+                                                            <label class="form-check-label fw-bold" for="organLiver">Liver</label>
                                                         </div>
                                                         <div class="form-check">
                                                             <input class="form-check-input" type="checkbox" name="Organ" id="organHeart" value="Heart">
-                                                            <label class="form-check-label" for="organHeart">Heart</label>
+                                                            <label class="form-check-label fw-bold" for="organHeart">Heart</label>
                                                         </div>
                                                     </div>
                                                     <div class="col-12 col-md-4">
                                                         <div class="form-check">
                                                             <input class="form-check-input" type="checkbox" name="Organ" id="organPancreas" value="Pancreas">
-                                                            <label class="form-check-label" for="organPancreas">Pancreas</label>
+                                                            <label class="form-check-label fw-bold" for="organPancreas">Pancreas</label>
                                                         </div>
                                                         <div class="form-check">
                                                             <input class="form-check-input" type="checkbox" name="Organ" id="organIntestine" value="Intestine">
-                                                            <label class="form-check-label" for="organIntestine">Intestine</label>
+                                                            <label class="form-check-label fw-bold" for="organIntestine">Intestine</label>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="mb-3">
-                                                <label for="DonorWeight" class="form-label">Weight (kg)</label>
+                                                <label for="DonorWeight" class="form-label fw-bold">Weight (kg)</label>
                                                 <input type="number" class="form-control" id="DonorWeight" placeholder="Weight" min="0">
                                             </div>
                                             <div class="mb-3">
-                                                <label for="DonorHeight" class="form-label">Height (cm)</label>
+                                                <label for="DonorHeight" class="form-label fw-bold">Height (cm)</label>
                                                 <input type="number" class="form-control" id="DonorHeight" placeholder="Height" min="0">
                                             </div>
                                             <div class="d-grid gap-2">
