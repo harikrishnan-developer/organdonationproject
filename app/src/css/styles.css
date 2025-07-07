@@ -38,12 +38,21 @@ html{
   /* background-color: #94e1ff; */
 }
 
-body{
+body, html {
+  width: 100vw;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
   background: #eef5f9 !important; /* Lighter, softer blue */
   font-family: "Montserrat", sans-serif !important;
 }
 
-main{
+main {
+  width: 100vw;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
   margin-bottom: 1rem;
 }
 
@@ -1003,4 +1012,15 @@ header nav .navbar-nav .nav-link:hover {
 .badge-danger {
     background-color: #b30000 !important;
     color: #fff;
+}
+
+.full-width-table-wrapper {
+  width: 100vw !important;
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
+  overflow-x: auto;
+}
+.full-width-table {
+  width: 100vw !important;
+  min-width: 1200px;
 }

@@ -20,7 +20,7 @@
 
             <!-- start of navigation-->
             <header>
-                <div class="container">
+                <div class="container-fluid">
                     <div class="row">
                         <div class="col-12">
                             <nav>
@@ -32,12 +32,12 @@
             </header>
             <!-- end of navigation-->
     
-            <main>            
+            <main style="width:100vw; min-height:100vh;">            
                 <!-- Access Control Section -->
                 <div id="accessControlSection" style="display: block;">
-                    <div class="container">
-                        <div class="row center-box">
-                            <div class="col-md-12">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-12">
                                 <div class="alert alert-danger text-center">
                                     <h4>🔒 Access Restricted</h4>
                                     <p style="font-weight: bold; color: black;">This page is only accessible to authorized personnel.</p>
@@ -52,18 +52,18 @@
 
                 <!-- Main Content Section -->
                 <div id="mainContentSection" style="display: none;">
-                    <div class="container">
-                        <div class="row center-box">
-                            <div class="col-md-12">
-                                <h2 class="text-center mb-4">AI-Powered Transplant Matching</h2>
-                                <p class="text-center text-muted">Using machine learning to find the best donor-patient matches based on compatibility scores</p>
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-12">
+                                <h2 class="text-center mb-4"><strong>AI-Powered Transplant Matching</strong></h2>
+                                <p class="text-center text-muted"><strong>Using machine learning to find the best donor-patient matches based on compatibility scores</strong></p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="container">
-                        <div class="row center-box">
-                            <div class="col-md-1">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-12">
                                 <div class="spinner">
                                     <div class="bounce1"></div>
                                     <div class="bounce2"></div>
@@ -73,9 +73,9 @@
                         </div> <!-- end of row -->
                     </div> <!-- end of container -->    
                             
-                    <div class="container">
-                        <div class="row center-box mb-4">
-                            <div class="col-md-12">
+                    <div class="container-fluid">
+                        <div class="row mb-4">
+                            <div class="col-12">
                                 <div class="card">
                                     <div class="card-header bg-primary text-white">
                                         <h4 class="mb-0">🎯 Match Recommendations</h4>
@@ -98,7 +98,7 @@
                                             </div>
                                             <div class="col-md-3">
                                                 <div class="text-center">
-                                                    <div style="font-size: 2rem; color: #17a2b8;">🧠</div>
+                                                    <div style="font-size: 2rem; color: #17a2b8;">⎈</div>
                                                     <h5>AI Model</h5>
                                                     <span id="aiStatus" class="badge badge-warning">Training...</span>
                                                 </div>
@@ -117,27 +117,29 @@
                         </div>
                     </div>
 
-                    <div class="container">
-                        <div class="row center-box">
-                            <div class="col-md-12">
-                                <div class="table-responsive">
-                                    <table id="transplantTable" class="table table-striped table-hover">
-                                        <thead class="thead-dark">
-                                            <!-- AI-enhanced headers will be generated here -->
-                                        </thead>
-                                        <tbody>
-                                            <!-- Match data will be populated here -->
-                                        </tbody>
-                                    </table>
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="full-width-table-wrapper">
+                                    <div class="table-responsive">
+                                        <table id="transplantTable" class="table table-striped table-hover full-width-table">
+                                            <thead class="thead-dark">
+                                                <!-- AI-enhanced headers will be generated here -->
+                                            </thead>
+                                            <tbody>
+                                                <!-- Match data will be populated here -->
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- AI Insights Section -->
-                    <div class="container mt-4">
+                    <div class="container-fluid mt-4">
                         <div class="row">
-                            <div class="col-md-12">
+                            <div class="col-12">
                                 <div class="card">
                                     <div class="card-header bg-info text-white">
                                         <h5 class="mb-0">🧠 AI Insights</h5>
@@ -175,7 +177,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script src="../js/ipfs-utils.js"></script>
     <script src="../js/ai-matching.js"></script>
+    <script src="../js/match-results.js"></script>
     <script src="../main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+    <script src="../js/match-results-abi.js"></script>
     <script>
         // Access control configuration
         const AUTHORIZED_ADDRESS = '0x41e010afc84819B6183512D8e6116935fA18cC6C';
@@ -232,4 +237,6 @@
         };
     </script>
     <button onclick="window.history.back()" class="btn btn-secondary mt-3 ml-3">← Back</button>
+    <!-- Optionally, add a section to display blockchain matches -->
+    <div id="blockchainMatches"></div>
 </html>

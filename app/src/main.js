@@ -861,7 +861,8 @@ const App = {
             const headers = [
                 "Rank", "Patient Name", "Patient Age", "Patient Blood", "Organ", 
                 "Urgency", "AI Score", "Blood Match", "Tissue Match", "Combined Score", 
-                "Donor Name", "Donor Age", "Donor Blood", "Match Quality", "Risk Level"
+                "Donor Name", "Donor Age", "Donor Blood", "Match Quality", "Risk Level",
+                "Actions"
             ];
             
             headers.forEach(header => {
@@ -931,7 +932,10 @@ const App = {
                         riskLevel.trim().toLowerCase() === 'very high' ? 'badge badge-darkred' :
                         'badge badge-secondary'
                     }">${riskLevel}</span></td>
-                    <td><button class="btn btn-outline-success btn-sm" onclick="App.openIpfsModal(${index})">Save to IPFS</button></td>
+                    <td>
+                        <button class="btn btn-outline-primary btn-sm" onclick="App.saveMatchToBlockchain(${index})"><strong>Save to Blockchain</strong></button>
+                        <button class="btn btn-outline-success btn-sm ml-1" onclick="App.openIpfsModal(${index})"><strong>Save to IPFS</strong></button>
+                    </td>
                 `;
             });
         } else {
@@ -1179,6 +1183,26 @@ const App = {
         document.getElementById('ipfsPasswordInput').value = '';
         document.getElementById('ipfsPasswordError').textContent = '';
         document.getElementById('ipfsPasswordModal').style.display = 'flex';
+    },
+
+    saveMatchToBlockchain: async function(index) {
+        if (!window.currentRecommendations || !window.currentRecommendations[index]) {
+            alert('Match data not found.');
+            return;
+        }
+        const rec = window.currentRecommendations[index];
+        try {
+            // Use the browser-compatible saveMatchResult (from match-results.js)
+            await window.saveMatchResult(
+                rec.donor.id || rec.donor.name || '',
+                rec.patient.id || rec.patient.name || '',
+                rec.organ,
+                Math.round(rec.combinedScore * 100)
+            );
+            alert('Match result saved to blockchain!');
+        } catch (err) {
+            alert('Failed to save match: ' + (err && err.message ? err.message : err));
+        }
     }
 }
 

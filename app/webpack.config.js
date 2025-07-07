@@ -50,6 +50,7 @@ module.exports = {
     new CopyWebpackPlugin([{ from: "./status-check.html", to: "status-check.html" }]),
     new CopyWebpackPlugin([{from: "./src/html/admin.html", to: "admin.html"}]),
     new CopyWebpackPlugin([{ from: "./src/images/Screenshot__14_-removebg-preview.png", to: "images/Screenshot__14_-removebg-preview.png" }]),
+    new CopyWebpackPlugin([{ from: "./src/js/match-results.js", to: "js/match-results.js" }]),
   ],
   devServer: { 
     contentBase: path.join(__dirname, "dist"), 
