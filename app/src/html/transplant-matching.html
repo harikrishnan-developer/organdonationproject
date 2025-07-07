@@ -33,62 +33,82 @@
             <!-- end of navigation-->
     
             <main>            
-                <div class="container">
-                    <div class="row center-box">
-                        <div class="col-md-12">
-                            <h2 class="text-center mb-4">AI-Powered Transplant Matching</h2>
-                            <p class="text-center text-muted">Using machine learning to find the best donor-patient matches based on compatibility scores</p>
+                <!-- Access Control Section -->
+                <div id="accessControlSection" style="display: block;">
+                    <div class="container">
+                        <div class="row center-box">
+                            <div class="col-md-12">
+                                <div class="alert alert-danger text-center">
+                                    <h4>🔒 Access Restricted</h4>
+                                    <p style="font-weight: bold; color: black;">This page is only accessible to authorized personnel.</p>
+                                    <button id="connectWalletBtn" class="btn btn-primary btn-lg" onclick="App.connect()">Connect with MetaMask</button>
+                                    <div id="walletInfo" class="alert alert-success mt-3" style="display:none;"></div>
+                                    <button onclick="window.history.back()" class="btn btn-secondary ml-2">← Go Back</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="container">
-                    <div class="row center-box">
-                        <div class="col-md-1">
-                            <div class="spinner">
-                                <div class="bounce1"></div>
-                                <div class="bounce2"></div>
-                                <div class="bounce3"></div>
-                            </div><br>
+                <!-- Main Content Section -->
+                <div id="mainContentSection" style="display: none;">
+                    <div class="container">
+                        <div class="row center-box">
+                            <div class="col-md-12">
+                                <h2 class="text-center mb-4">AI-Powered Transplant Matching</h2>
+                                <p class="text-center text-muted">Using machine learning to find the best donor-patient matches based on compatibility scores</p>
+                            </div>
                         </div>
-                    </div> <!-- end of row -->
-                </div> <!-- end of container -->    
-                        
-                <div class="container">
-                    <div class="row center-box mb-4">
-                        <div class="col-md-12">
-                            <div class="card">
-                                <div class="card-header bg-primary text-white">
-                                    <h4 class="mb-0">🎯 Match Recommendations</h4>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-md-3">
-                                            <div class="text-center">
-                                                <div style="font-size: 2rem; color: #dc3545;">👤</div>
-                                                <h5>Patients</h5>
-                                                <span id="patientCount" class="badge badge-primary">0</span>
+                    </div>
+
+                    <div class="container">
+                        <div class="row center-box">
+                            <div class="col-md-1">
+                                <div class="spinner">
+                                    <div class="bounce1"></div>
+                                    <div class="bounce2"></div>
+                                    <div class="bounce3"></div>
+                                </div><br>
+                            </div>
+                        </div> <!-- end of row -->
+                    </div> <!-- end of container -->    
+                            
+                    <div class="container">
+                        <div class="row center-box mb-4">
+                            <div class="col-md-12">
+                                <div class="card">
+                                    <div class="card-header bg-primary text-white">
+                                        <h4 class="mb-0">🎯 Match Recommendations</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <div class="text-center">
+                                                    <div style="font-size: 2rem; color: #dc3545;">👤</div>
+                                                    <h5>Patients</h5>
+                                                    <span id="patientCount" class="badge badge-primary">0</span>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="text-center">
-                                                <div style="font-size: 2rem; color: #28a745;">+</div>
-                                                <h5>Donors</h5>
-                                                <span id="donorCount" class="badge badge-success">0</span>
+                                            <div class="col-md-3">
+                                                <div class="text-center">
+                                                    <div style="font-size: 2rem; color: #28a745;">+</div>
+                                                    <h5>Donors</h5>
+                                                    <span id="donorCount" class="badge badge-success">0</span>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="text-center">
-                                                <div style="font-size: 2rem; color: #17a2b8;">🧠</div>
-                                                <h5>AI Model</h5>
-                                                <span id="aiStatus" class="badge badge-warning">Training...</span>
+                                            <div class="col-md-3">
+                                                <div class="text-center">
+                                                    <div style="font-size: 2rem; color: #17a2b8;">🧠</div>
+                                                    <h5>AI Model</h5>
+                                                    <span id="aiStatus" class="badge badge-warning">Training...</span>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="text-center">
-                                                <div style="font-size: 2rem; color: #007bff;">🤝</div>
-                                                <h5>Matches Found</h5>
-                                                <span id="matchCount" class="badge badge-info">0</span>
+                                            <div class="col-md-3">
+                                                <div class="text-center">
+                                                    <div style="font-size: 2rem; color: #007bff;">🤝</div>
+                                                    <h5>Matches Found</h5>
+                                                    <span id="matchCount" class="badge badge-info">0</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -96,36 +116,36 @@
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="container">
-                    <div class="row center-box">
-                        <div class="col-md-12">
-                            <div class="table-responsive">
-                                <table id="transplantTable" class="table table-striped table-hover">
-                                    <thead class="thead-dark">
-                                        <!-- AI-enhanced headers will be generated here -->
-                                    </thead>
-                                    <tbody>
-                                        <!-- Match data will be populated here -->
-                                    </tbody>
-                                </table>
+                    <div class="container">
+                        <div class="row center-box">
+                            <div class="col-md-12">
+                                <div class="table-responsive">
+                                    <table id="transplantTable" class="table table-striped table-hover">
+                                        <thead class="thead-dark">
+                                            <!-- AI-enhanced headers will be generated here -->
+                                        </thead>
+                                        <tbody>
+                                            <!-- Match data will be populated here -->
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- AI Insights Section -->
-                <div class="container mt-4">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="card">
-                                <div class="card-header bg-info text-white">
-                                    <h5 class="mb-0">🧠 AI Insights</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div id="aiInsights">
-                                        <p class="text-muted">AI analysis will appear here once matches are processed...</p>
+                    <!-- AI Insights Section -->
+                    <div class="container mt-4">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="card">
+                                    <div class="card-header bg-info text-white">
+                                        <h5 class="mb-0">🧠 AI Insights</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="aiInsights">
+                                            <p class="text-muted">AI analysis will appear here once matches are processed...</p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -157,7 +177,59 @@
     <script src="../js/ai-matching.js"></script>
     <script src="../main.js"></script>
     <script>
-        window.onload = function() { App.enhancedTransplantMatch(); };
+        // Access control configuration
+        const AUTHORIZED_ADDRESS = '0x41e010afc84819B6183512D8e6116935fA18cC6C';
+        
+        // Override the updateUI function for transplant matching page
+        const originalUpdateUI = App.updateUI;
+        App.updateUI = function() {
+            const connectButton = document.getElementById('connectWalletBtn');
+            const accessControlSection = document.getElementById('accessControlSection');
+            const mainContentSection = document.getElementById('mainContentSection');
+            const walletInfo = document.getElementById('walletInfo');
+            
+            if (connectButton && accessControlSection && mainContentSection) {
+                if (this.accounts && this.accounts.length > 0) {
+                    const userAccount = this.accounts[0].toLowerCase();
+                    
+                    // Check if user has access to transplant matching
+                    if (userAccount === AUTHORIZED_ADDRESS.toLowerCase()) {
+                        // Access granted
+                        connectButton.style.display = 'none';
+                        accessControlSection.style.display = 'none';
+                        mainContentSection.style.display = 'block';
+                        if (walletInfo) {
+                            walletInfo.innerHTML = `Connected: ${this.accounts[0].substring(0, 6)}...${this.accounts[0].substring(38)}`;
+                            walletInfo.style.display = 'block';
+                        }
+                        // Start the transplant matching functionality
+                        App.enhancedTransplantMatch();
+                    } else {
+                        // Access denied
+                        connectButton.style.display = 'none';
+                        accessControlSection.style.display = 'block';
+                        mainContentSection.style.display = 'none';
+                        if (walletInfo) {
+                            walletInfo.innerHTML = `Connected: ${this.accounts[0].substring(0, 6)}...${this.accounts[0].substring(38)}`;
+                            walletInfo.style.display = 'block';
+                        }
+                    }
+                } else {
+                    // Not connected
+                    connectButton.style.display = 'block';
+                    accessControlSection.style.display = 'block';
+                    mainContentSection.style.display = 'none';
+                    if (walletInfo) {
+                        walletInfo.style.display = 'none';
+                    }
+                }
+            }
+        };
+        
+        // Initialize the page
+        window.onload = function() {
+            App.start();
+        };
     </script>
     <button onclick="window.history.back()" class="btn btn-secondary mt-3 ml-3">← Back</button>
 </html>

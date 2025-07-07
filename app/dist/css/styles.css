@@ -994,3 +994,13 @@ header nav .navbar-nav .nav-link:hover {
     background-color: rgba(255, 255, 255, 0.5);
     color: #004964 !important;
 }
+
+.badge-darkred {
+    background-color: #8B0000 !important; /* Dark red */
+    color: #fff;
+}
+
+.badge-danger {
+    background-color: #b30000 !important;
+    color: #fff;
+}

@@ -26,6 +26,7 @@ function encryptData(data, password) {
 
 // Uploads encrypted data to IPFS via Pinata
 async function uploadMatchResultToIPFS(matchResult, password) {
+  console.log('Uploading match result to IPFS:', matchResult); // Debug log
   const encrypted = encryptData(matchResult, password);
   try {
     const response = await axios.post(PINATA_API_URL, {

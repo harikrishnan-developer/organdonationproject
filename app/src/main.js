@@ -717,8 +717,6 @@ const App = {
 
         // Initialize AI matcher
         const aiMatcher = new AITransplantMatcher();
-        
-        // Load random forest model (no training in browser)
         await aiMatcher.loadRandomForestModel();
         document.getElementById("aiStatus").innerHTML = "Ready";
         document.getElementById("aiStatus").className = "badge badge-success";
@@ -733,7 +731,7 @@ const App = {
         document.getElementById("patientCount").innerHTML = patientCount;
         document.getElementById("donorCount").innerHTML = donorCount;
 
-        // Prepare patient data
+        // Prepare patient data with enhanced features
         const patients = [];
         for (let i = 0; i < patientCount; i++) {
             const result = await this.contractInstance.methods.getPatient(patientIDs[i]).call();
@@ -741,19 +739,25 @@ const App = {
             for (let o = 0; o < result[4].length; o++) {
                 organsArr.push(result[4][o]);
             }
-            patients.push({
+            const patient = {
                 id: patientIDs[i],
                 name: result[0],
-                age: result[1],
+                age: parseInt(result[1]),
                 gender: result[2],
                 bloodType: result[3],
                 organs: organsArr,
-                weight: result[5],
-                height: result[6]
-            });
+                weight: parseInt(result[5]),
+                height: parseInt(result[6]),
+                urgencyLevel: this.calculateUrgencyLevel(result[1], organsArr),
+                bmi: this.calculateBMI(result[5], result[6]),
+                medicalRisk: this.calculateMedicalRisk(result[1], result[5], result[6]),
+                waitingTime: this.generateWaitingTime(),
+                previousTransplants: this.generateTransplantHistory(),
+                location: this.generateLocation()
+            };
+            patients.push(patient);
         }
-
-        // Prepare donor data
+        // Prepare donor data with enhanced features
         const donors = [];
         for (let i = 0; i < donorCount; i++) {
             const result = await this.contractInstance.methods.getDonor(donorIDs[i]).call();
@@ -761,36 +765,103 @@ const App = {
             for (let o = 0; o < result[4].length; o++) {
                 organsArr.push(result[4][o]);
             }
-            donors.push({
+            const donor = {
                 id: donorIDs[i],
                 name: result[0],
-                age: result[1],
+                age: parseInt(result[1]),
                 gender: result[2],
                 bloodType: result[3],
                 organs: organsArr,
-                weight: result[5],
-                height: result[6]
-            });
+                weight: parseInt(result[5]),
+                height: parseInt(result[6]),
+                bmi: this.calculateBMI(result[5], result[6]),
+                location: this.generateLocation(),
+                availabilityScore: this.calculateAvailabilityScore(),
+                medicalHistory: this.generateMedicalHistory()
+            };
+            donors.push(donor);
         }
-
-        // Get AI-powered recommendations
-        const recommendations = await aiMatcher.getMatchRecommendations(patients, donors);
+        // Get enhanced AI-powered recommendations
+        const recommendations = [];
+        for (const patient of patients) {
+            for (const donor of donors) {
+                for (const patientOrgan of patient.organs) {
+                    if (donor.organs.includes(patientOrgan)) {
+                        const bloodCompatibility = this.calculateBloodCompatibility(donor.bloodType, patient.bloodType);
+                        const tissueCompatibility = this.calculateTissueCompatibility(patient, donor);
+                        // Use Random Forest model for AI score
+                        const aiScore = aiMatcher.predictMatchScore(
+                            { bloodType: donor.bloodType, age: donor.age },
+                            { bloodType: patient.bloodType, age: patient.age },
+                            patientOrgan
+                        );
+                        const urgencyScore = this.calculateUrgencyScore(patient.urgencyLevel);
+                        const combinedScore = (
+                            (aiScore * 0.35) +
+                            (bloodCompatibility * 0.25) +
+                            (tissueCompatibility * 0.25) +
+                            (urgencyScore * 0.15)
+                        );
+                        if (bloodCompatibility === 0 || tissueCompatibility === 0 || combinedScore > 0.3) {
+                            // Enhanced match quality assessment
+                            let qualityClass = '';
+                            let qualityText = '';
+                            let riskLevel = '';
+                            if (bloodCompatibility === 0 || tissueCompatibility === 0) {
+                                qualityClass = 'text-danger';
+                                qualityText = 'Incompatible';
+                                riskLevel = 'N/A';
+                            } else if (combinedScore >= 0.85) {
+                                qualityClass = 'text-success';
+                                qualityText = 'Excellent';
+                                riskLevel = 'Low';
+                            } else if (combinedScore >= 0.70) {
+                                qualityClass = 'text-warning';
+                                qualityText = 'Good';
+                                riskLevel = 'Medium';
+                            } else if (combinedScore >= 0.50) {
+                                qualityClass = 'text-info';
+                                qualityText = 'Fair';
+                                riskLevel = 'High';
+                            } else {
+                                qualityClass = 'text-danger';
+                                qualityText = 'Poor';
+                                riskLevel = 'Very High';
+                            }
+                            recommendations.push({
+                                patient: patient,
+                                donor: donor,
+                                organ: patientOrgan,
+                                aiScore: aiScore,
+                                bloodCompatibility: bloodCompatibility,
+                                tissueCompatibility: tissueCompatibility,
+                                combinedScore: combinedScore,
+                                urgencyScore: urgencyScore,
+                                qualityText: qualityText,
+                                riskLevel: riskLevel
+                            });
+                        }
+                    }
+                }
+            }
+        }
+        recommendations.sort((a, b) => b.combinedScore - a.combinedScore);
         
         // Update match count
         document.getElementById("matchCount").innerHTML = recommendations.length;
 
-        // Display matches in table
+        // Display enhanced matches in table
         const table = document.getElementById("transplantTable");
         table.innerHTML = '';
 
         if (recommendations.length > 0) {
-            // Create table header
+            // Create enhanced table header
             const thead = table.createTHead();
             const headerRow = thead.insertRow();
             const headers = [
                 "Rank", "Patient Name", "Patient Age", "Patient Blood", "Organ", 
-                "AI Score", "Basic Compatibility", "Combined Score", "Donor Name", 
-                "Donor Age", "Donor Blood", "Match Quality"
+                "Urgency", "AI Score", "Blood Match", "Tissue Match", "Combined Score", 
+                "Donor Name", "Donor Age", "Donor Blood", "Match Quality", "Risk Level"
             ];
             
             headers.forEach(header => {
@@ -799,33 +870,43 @@ const App = {
                 headerRow.appendChild(th);
             });
 
-            // Create table body
+            // Create enhanced table body
             const tbody = table.createTBody();
             recommendations.forEach((rec, index) => {
                 const row = tbody.insertRow();
                 
-                // Determine match quality color
+                // Enhanced match quality assessment
                 let qualityClass = '';
                 let qualityText = '';
-                // Check blood compatibility first
-                if (rec.basicCompatibility === 0) {
+                let riskLevel = '';
+                
+                if (rec.bloodCompatibility === 0 || rec.tissueCompatibility === 0) {
                     qualityClass = 'text-danger';
                     qualityText = 'Incompatible';
-                } else if (rec.combinedScore >= 0.8) {
+                    riskLevel = 'N/A';
+                } else if (rec.combinedScore >= 0.85) {
                     qualityClass = 'text-success';
                     qualityText = 'Excellent';
-                } else if (rec.combinedScore >= 0.6) {
+                    riskLevel = 'Low';
+                } else if (rec.combinedScore >= 0.70) {
                     qualityClass = 'text-warning';
                     qualityText = 'Good';
-                } else if (rec.combinedScore >= 0.4) {
+                    riskLevel = 'Medium';
+                } else if (rec.combinedScore >= 0.50) {
                     qualityClass = 'text-info';
                     qualityText = 'Fair';
+                    riskLevel = 'High';
                 } else {
                     qualityClass = 'text-danger';
                     qualityText = 'Poor';
+                    riskLevel = 'Very High';
                 }
+                
+                // Debug logging
+                console.log('Combined Score:', rec.combinedScore);
+                console.log('Risk Level:', riskLevel);
 
-                // Determine organ label/icon
+                // Determine organ label
                 let organLabel = rec.organ;
 
                 row.innerHTML = `
@@ -834,31 +915,199 @@ const App = {
                     <td>${rec.patient.age}</td>
                     <td><span class="badge badge-secondary">${rec.patient.bloodType}</span></td>
                     <td>${organLabel}</td>
+                    <td><span class="${rec.patient.urgencyLevel === 'Critical' ? 'badge badge-danger' : rec.patient.urgencyLevel === 'High' ? 'badge badge-warning' : rec.patient.urgencyLevel === 'Medium' ? 'badge badge-info' : 'badge badge-success'}">${rec.patient.urgencyLevel}</span></td>
                     <td><span class="badge badge-info">${(rec.aiScore * 100).toFixed(1)}%</span></td>
-                    <td><span class="badge badge-secondary">${(rec.basicCompatibility * 100).toFixed(1)}%</span></td>
+                    <td><span class="badge badge-secondary">${(rec.bloodCompatibility * 100).toFixed(1)}%</span></td>
+                    <td><span class="badge badge-primary">${(rec.tissueCompatibility * 100).toFixed(1)}%</span></td>
                     <td><span class="badge badge-primary">${(rec.combinedScore * 100).toFixed(1)}%</span></td>
                     <td>${rec.donor.name}</td>
                     <td>${rec.donor.age}</td>
                     <td><span class="badge badge-secondary">${rec.donor.bloodType}</span></td>
                     <td><span class="${qualityClass}"><strong>${qualityText}</strong></span></td>
-                    <td><button class='btn btn-outline-success btn-sm' onclick='uploadMatchToIPFS(${index})'>Save to IPFS</button></td>
+                    <td><span class="${
+                        riskLevel.trim().toLowerCase() === 'low' ? 'badge badge-success' :
+                        riskLevel.trim().toLowerCase() === 'medium' ? 'badge badge-warning' :
+                        riskLevel.trim().toLowerCase() === 'high' ? 'badge badge-danger' :
+                        riskLevel.trim().toLowerCase() === 'very high' ? 'badge badge-darkred' :
+                        'badge badge-secondary'
+                    }">${riskLevel}</span></td>
+                    <td><button class="btn btn-outline-success btn-sm" onclick="App.openIpfsModal(${index})">Save to IPFS</button></td>
                 `;
             });
         } else {
-            table.innerHTML = '<tr><td colspan="12" class="text-center text-muted">No matches found</td></tr>';
+            table.innerHTML = '<tr><td colspan="16" class="text-center text-muted">No matches found</td></tr>';
         }
 
         // Store recommendations globally for access by uploadMatchToIPFS
         window.currentRecommendations = recommendations;
 
-        // Generate AI insights
-        this.generateAIInsights(recommendations, patients, donors, aiMatcher);
+        // Generate enhanced AI insights
+        this.generateEnhancedAIInsights(recommendations, patients, donors, aiMatcher);
 
         const spinner = document.querySelector(".spinner");
         spinner.style.display = "none";
     },
 
-    generateAIInsights: function(recommendations, patients, donors, aiMatcher) {
+    // Enhanced helper functions
+    calculateUrgencyLevel: function(age, organs) {
+        const ageNum = parseInt(age);
+        let urgency = 'Low';
+        
+        if (ageNum > 65) urgency = 'High';
+        else if (ageNum > 50) urgency = 'Medium';
+        
+        // Organ-specific urgency
+        if (organs.includes('heart') || organs.includes('liver')) {
+            urgency = 'Critical';
+        } else if (organs.includes('lung')) {
+            urgency = 'High';
+        }
+        
+        return urgency;
+    },
+
+    calculateBMI: function(weight, height) {
+        const weightKg = parseInt(weight);
+        const heightM = parseInt(height) / 100;
+        return (weightKg / (heightM * heightM)).toFixed(1);
+    },
+
+    calculateMedicalRisk: function(age, weight, height) {
+        const ageNum = parseInt(age);
+        const bmi = this.calculateBMI(weight, height);
+        let risk = 0;
+        
+        if (ageNum > 70) risk += 0.3;
+        if (bmi > 30) risk += 0.2;
+        if (bmi < 18.5) risk += 0.2;
+        
+        return Math.min(risk, 1);
+    },
+
+    calculateDonorHealthScore: function(age, weight, height) {
+        const ageNum = parseInt(age);
+        const bmi = this.calculateBMI(weight, height);
+        let score = 100;
+        
+        if (ageNum > 60) score -= 20;
+        if (bmi > 30 || bmi < 18.5) score -= 15;
+        
+        return Math.max(score, 50);
+    },
+
+    generateWaitingTime: function() {
+        return Math.floor(Math.random() * 365) + 1; // 1-365 days
+    },
+
+    generateTransplantHistory: function() {
+        return Math.random() > 0.8 ? 1 : 0; // 20% chance of previous transplant
+    },
+
+    generateLocation: function() {
+        const cities = ['Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Kolkata'];
+        return cities[Math.floor(Math.random() * cities.length)];
+    },
+
+    generateMedicalHistory: function() {
+        return Math.random() > 0.9 ? 'Clean' : 'Minor Issues';
+    },
+
+    calculateAvailabilityScore: function() {
+        return Math.floor(Math.random() * 30) + 70; // 70-100%
+    },
+
+    calculateBloodCompatibility: function(donorBlood, patientBlood) {
+        // Donor-centric blood type compatibility
+        const donorCompatibility = {
+            'O-': ['O-', 'O+', 'A-', 'A+', 'B-', 'B+', 'AB-', 'AB+'],
+            'O+': ['O+', 'A+', 'B+', 'AB+'],
+            'A-': ['A-', 'A+', 'AB-', 'AB+'],
+            'A+': ['A+', 'AB+'],
+            'B-': ['B-', 'B+', 'AB-', 'AB+'],
+            'B+': ['B+', 'AB+'],
+            'AB-': ['AB-', 'AB+'],
+            'AB+': ['AB+']
+        };
+        return donorCompatibility[donorBlood] && donorCompatibility[donorBlood].includes(patientBlood) ? 1.0 : 0.0;
+    },
+
+    calculateTissueCompatibility: function(patient, donor) {
+        // Simulated HLA compatibility (in real system, this would be actual tissue typing)
+        let compatibility = 0.5; // Base compatibility
+        
+        // Age factor
+        const ageDiff = Math.abs(patient.age - donor.age);
+        if (ageDiff < 10) compatibility += 0.2;
+        else if (ageDiff < 20) compatibility += 0.1;
+        
+        // BMI factor
+        const bmiDiff = Math.abs(patient.bmi - donor.bmi);
+        if (bmiDiff < 5) compatibility += 0.2;
+        else if (bmiDiff < 10) compatibility += 0.1;
+        
+        // Gender factor (some organs have gender preferences)
+        if (patient.gender === donor.gender) compatibility += 0.1;
+        
+        return Math.min(compatibility, 1.0);
+    },
+
+    calculateUrgencyScore: function(urgencyLevel) {
+        const urgencyScores = {
+            'Critical': 1.0,
+            'High': 0.8,
+            'Medium': 0.6,
+            'Low': 0.4
+        };
+        return urgencyScores[urgencyLevel] || 0.5;
+    },
+
+    getUrgencyBadge: function(urgencyLevel) {
+        console.log('Urgency Level:', urgencyLevel); // Debug log
+        let badgeClass = '';
+        switch(urgencyLevel) {
+            case 'Critical':
+                badgeClass = 'badge badge-danger';
+                break;
+            case 'High':
+                badgeClass = 'badge badge-warning';
+                break;
+            case 'Medium':
+                badgeClass = 'badge badge-info';
+                break;
+            case 'Low':
+                badgeClass = 'badge badge-success';
+                break;
+            default:
+                badgeClass = 'badge badge-secondary';
+        }
+        console.log('Urgency Badge Class:', badgeClass); // Debug log
+        return `<span class="${badgeClass}">${urgencyLevel}</span>`;
+    },
+
+    getRiskBadge: function(riskLevel) {
+        console.log('Risk Level:', riskLevel); // Debug log
+        let badgeClass = '';
+        switch(riskLevel) {
+            case 'Low':
+                badgeClass = 'badge badge-success';
+                break;
+            case 'Medium':
+                badgeClass = 'badge badge-warning';
+                break;
+            case 'High':
+                badgeClass = 'badge badge-danger';
+                break;
+            case 'Very High':
+                badgeClass = 'badge badge-darkred';
+                break;
+            default:
+                badgeClass = 'badge badge-secondary';
+        }
+        console.log('Badge Class:', badgeClass); // Debug log
+        return `<span class="${badgeClass}">${riskLevel}</span>`;
+    },
+
+    generateEnhancedAIInsights: function(recommendations, patients, donors, aiMatcher) {
         const insightsDiv = document.getElementById("aiInsights");
         
         if (recommendations.length === 0) {
@@ -866,11 +1115,13 @@ const App = {
             return;
         }
 
-        // Calculate statistics
+        // Enhanced statistics
         const avgAIScore = recommendations.reduce((sum, rec) => sum + rec.aiScore, 0) / recommendations.length;
         const avgCombinedScore = recommendations.reduce((sum, rec) => sum + rec.combinedScore, 0) / recommendations.length;
-        const excellentMatches = recommendations.filter(rec => rec.combinedScore >= 0.8).length;
-        const goodMatches = recommendations.filter(rec => rec.combinedScore >= 0.6 && rec.combinedScore < 0.8).length;
+        const excellentMatches = recommendations.filter(rec => rec.combinedScore >= 0.85).length;
+        const goodMatches = recommendations.filter(rec => rec.combinedScore >= 0.70 && rec.combinedScore < 0.85).length;
+        const criticalPatients = patients.filter(p => p.urgencyLevel === 'Critical').length;
+        const highRiskMatches = recommendations.filter(rec => rec.combinedScore < 0.5).length;
 
         // Find most common organs
         const organCounts = {};
@@ -885,39 +1136,50 @@ const App = {
         insightsDiv.innerHTML = `
             <div class="row">
                 <div class="col-md-6">
-                    <h6>📊 Match Statistics</h6>
+                    <h6>📊 Enhanced Match Statistics</h6>
                     <ul class="list-unstyled">
                         <li><strong>Total Matches:</strong> ${recommendations.length}</li>
                         <li><strong>Average AI Score:</strong> ${(avgAIScore * 100).toFixed(1)}%</li>
                         <li><strong>Average Combined Score:</strong> ${(avgCombinedScore * 100).toFixed(1)}%</li>
-                        <li><strong>Excellent Matches (≥80%):</strong> ${excellentMatches}</li>
-                        <li><strong>Good Matches (≥60%):</strong> ${goodMatches}</li>
+                        <li><strong>Excellent Matches (≥85%):</strong> ${excellentMatches}</li>
+                        <li><strong>Good Matches (≥70%):</strong> ${goodMatches}</li>
+                        <li><strong>Critical Patients:</strong> ${criticalPatients}</li>
+                        <li><strong>High Risk Matches:</strong> ${highRiskMatches}</li>
                     </ul>
                 </div>
                 <div class="col-md-6">
-                    <h6>💡 Key Insights</h6>
+                    <h6>💡 Enhanced Insights</h6>
                     <ul class="list-unstyled">
                         <li><strong>Most Requested Organ:</strong> ${mostCommonOrgan}</li>
                         <li><strong>Best Match Score:</strong> ${(bestMatch.combinedScore * 100).toFixed(1)}%</li>
                         <li><strong>Patient-Donor Ratio:</strong> ${patients.length}:${donors.length}</li>
-                        <li><strong>AI Model Confidence:</strong> High (trained on 10000 records)</li>
+                        <li><strong>Enhanced AI Model:</strong> Multi-factor analysis</li>
+                        <li><strong>Risk Assessment:</strong> Integrated</li>
+                        <li><strong>Urgency Tracking:</strong> Active</li>
                     </ul>
                 </div>
             </div>
             <div class="row mt-3">
                 <div class="col-md-12">
-                    <h6>Top Result</h6>
+                    <h6>🏥 Top Medical Recommendation</h6>
                     <div class="alert alert-success">
-                        <strong>${bestMatch.patient.name}</strong> (${bestMatch.patient.bloodType}) 
+                        <strong>${bestMatch.patient.name}</strong> (${bestMatch.patient.bloodType}, ${bestMatch.patient.urgencyLevel} urgency) 
                         needs a <strong>${bestMatch.organ}</strong> and matches with 
-                        <strong>${bestMatch.donor.name}</strong> (${bestMatch.donor.bloodType}) 
+                        <strong>${bestMatch.donor.name}</strong> (${bestMatch.donor.bloodType}, Health: ${bestMatch.donor.healthScore}%) 
                         with a <strong>${(bestMatch.combinedScore * 100).toFixed(1)}%</strong> compatibility score.
+                        <br><small class="text-muted">Risk Level: ${bestMatch.combinedScore >= 0.85 ? 'Low' : bestMatch.combinedScore >= 0.70 ? 'Medium' : 'High'}</small>
                     </div>
                 </div>
             </div>
         `;
-    }
+    },
 
+    openIpfsModal: function(index) {
+        window.selectedMatchIndex = index;
+        document.getElementById('ipfsPasswordInput').value = '';
+        document.getElementById('ipfsPasswordError').textContent = '';
+        document.getElementById('ipfsPasswordModal').style.display = 'flex';
+    }
 }
 
 window.App = App;
@@ -930,18 +1192,7 @@ window.addEventListener("load", function() {
   App.start();
 });
 
-// Use modal for password input instead of prompt
-let pendingMatchIndex = null;
-
-window.uploadMatchToIPFS = function(matchIndex) {
-    pendingMatchIndex = matchIndex;
-    document.getElementById('ipfsPasswordInput').value = '';
-    document.getElementById('ipfsPasswordError').textContent = '';
-    document.getElementById('ipfsPasswordModal').style.display = 'flex';
-};
-
-// Attach handler for modal submit
-window.addEventListener('DOMContentLoaded', function() {
+window.addEventListener('load', function() {
     const submitBtn = document.getElementById('ipfsPasswordSubmit');
     if (submitBtn) {
         submitBtn.onclick = async function() {
@@ -951,7 +1202,7 @@ window.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             document.getElementById('ipfsPasswordModal').style.display = 'none';
-            const match = window.currentRecommendations[pendingMatchIndex];
+            const match = window.currentRecommendations[window.selectedMatchIndex];
             try {
                 const cid = await window.uploadMatchResultToIPFS(match, password);
                 document.getElementById('lastIpfsCid').innerHTML =

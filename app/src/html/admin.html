@@ -530,13 +530,30 @@ if (typeof App !== 'undefined' && App.accounts && App.accounts[0] && App.account
             // Pretty print JSON if possible
             try {
                 const obj = JSON.parse(plaintext);
-                resultPre.textContent = JSON.stringify(obj, null, 2);
-                window.lastDecryptedMatch = obj;
-                window.lastMatchVerified = false;
-                downloadBtn.style.display = 'inline-block';
+// resultPre.textContent = JSON.stringify(obj, null, 2); // Hide the JSON display
+window.lastDecryptedMatch = obj;
+
+// Generate unique match key
+let matchKey = '';
+if (obj.patient && obj.donor && obj.organ) {
+    matchKey = `${obj.patient.id}_${obj.donor.id}_${obj.organ}`;
+}
+
+// Check localStorage for verification
+let verifiedMatches = JSON.parse(localStorage.getItem('verifiedMatches') || '[]');
+if (matchKey && verifiedMatches.includes(matchKey)) {
+    window.lastMatchVerified = true;
+    document.getElementById('ipfsVerifiedBadge').style.display = 'inline-block';
+    document.getElementById('ipfsVerifyBtn').disabled = true;
+    document.getElementById('ipfsVerifyBtn').textContent = 'Verified';
+} else {
+    window.lastMatchVerified = false;
+    document.getElementById('ipfsVerifiedBadge').style.display = 'none';
+    document.getElementById('ipfsVerifyBtn').disabled = false;
+    document.getElementById('ipfsVerifyBtn').textContent = 'Verify';
+}
+downloadBtn.style.display = 'inline-block';
 document.getElementById('ipfsVerifyBtn').style.display = 'inline-block';
-document.getElementById('ipfsVerifiedBadge').style.display = 'none';
-                downloadBtn.style.display = 'inline-block';
             } catch {
                 resultPre.textContent = plaintext;
             }
@@ -561,22 +578,65 @@ document.getElementById('ipfsVerifiedBadge').style.display = 'none';
       
     
         // Table data
-        const tableBody = [
-            ['Patient Name', match.patient.name],
-            ['Patient Age', match.patient.age],
-            ['Patient Gender', match.patient.gender],
-            ['Patient Blood Type', match.patient.bloodType],
-            ['Patient Organ(s)', (Array.isArray(match.patient.organs) ? match.patient.organs.join(', ') : match.patient.organs)],
-            ['Donor Name', match.donor.name],
-            ['Donor Age', match.donor.age],
-            ['Donor Gender', match.donor.gender],
-            ['Donor Blood Type', match.donor.bloodType],
-            ['Donor Organ(s)', (Array.isArray(match.donor.organs) ? match.donor.organs.join(', ') : match.donor.organs)],
-            ['Matched Organ', match.organ],
-            ['AI Score', match.aiScore.toFixed(3)],
-            ['Basic Compatibility', match.basicCompatibility],
-            ['Combined Score', match.combinedScore.toFixed(3)]
-        ];
+        // Extract all available fields from the latest decrypted match object
+        const tableBody = [];
+        
+        // Patient information
+        if (match.patient) {
+            tableBody.push(['Patient Name', match.patient.name || 'N/A']);
+            tableBody.push(['Patient Age', match.patient.age || 'N/A']);
+            tableBody.push(['Patient Gender', match.patient.gender || 'N/A']);
+            tableBody.push(['Patient Blood Type', match.patient.bloodType || 'N/A']);
+            tableBody.push(['Patient Organ(s)', (Array.isArray(match.patient.organs) ? match.patient.organs.join(', ') : (match.patient.organs || 'N/A'))]);
+        }
+        
+        // Donor information
+        if (match.donor) {
+            tableBody.push(['Donor Name', match.donor.name || 'N/A']);
+            tableBody.push(['Donor Age', match.donor.age || 'N/A']);
+            tableBody.push(['Donor Gender', match.donor.gender || 'N/A']);
+            tableBody.push(['Donor Blood Type', match.donor.bloodType || 'N/A']);
+            tableBody.push(['Donor Organ(s)', (Array.isArray(match.donor.organs) ? match.donor.organs.join(', ') : (match.donor.organs || 'N/A'))]);
+        }
+        
+        // Match details
+        tableBody.push(['Matched Organ', match.organ || 'N/A']);
+        tableBody.push(['AI Score', match.aiScore ? match.aiScore.toFixed(3) : 'N/A']);
+        tableBody.push(['Combined Score', match.combinedScore ? match.combinedScore.toFixed(3) : 'N/A']);
+        
+        // Compatibility and match details
+        if (match.bloodCompatibility !== undefined) tableBody.push(['Blood Compatibility', (match.bloodCompatibility * 100).toFixed(1) + '%']);
+        if (match.tissueCompatibility !== undefined) tableBody.push(['Tissue Compatibility', (match.tissueCompatibility * 100).toFixed(1) + '%']);
+        if (match.qualityText !== undefined) tableBody.push(['Match Quality', match.qualityText || 'N/A']);
+        if (match.riskLevel !== undefined) tableBody.push(['Risk Level', match.riskLevel || 'N/A']);
+        
+        // Urgency - check for text-based urgency first, then fallback to score
+        if (match.urgency !== undefined) {
+            tableBody.push(['Urgency Level', match.urgency || 'N/A']);
+        } else if (match.urgencyScore !== undefined) {
+            // Convert urgency score to text level
+            let urgencyText = 'Low';
+            if (match.urgencyScore >= 0.7) urgencyText = 'High';
+            else if (match.urgencyScore >= 0.4) urgencyText = 'Medium';
+            tableBody.push(['Urgency Level', urgencyText]);
+        }
+        
+        // Additional fields that might be present (keeping for backward compatibility)
+        if (match.bloodMatch !== undefined) tableBody.push(['Blood Match', match.bloodMatch + '%']);
+        if (match.tissueMatch !== undefined) tableBody.push(['Tissue Match', match.tissueMatch + '%']);
+        if (match.matchQuality !== undefined) tableBody.push(['Match Quality', match.matchQuality || 'N/A']);
+        if (match.urgency !== undefined) tableBody.push(['Urgency Level', match.urgency || 'N/A']);
+        
+        // Add any other fields that might be present in the match object
+        Object.keys(match).forEach(key => {
+            if (!['patient', 'donor', 'organ', 'aiScore', 'combinedScore', 'bloodCompatibility', 'tissueCompatibility', 'qualityText', 'riskLevel', 'urgencyScore', 'bloodMatch', 'tissueMatch', 'matchQuality', 'urgency'].includes(key)) {
+                const value = match[key];
+                if (value !== undefined && value !== null) {
+                    const displayValue = typeof value === 'number' ? value.toFixed(3) : String(value);
+                    tableBody.push([key.charAt(0).toUpperCase() + key.slice(1), displayValue]);
+                }
+            }
+        });
     
         doc.autoTable({
     startY: 45,
@@ -604,9 +664,18 @@ if (window.lastMatchVerified) {
     document.getElementById('ipfsVerifiedBadge').style.display = 'inline-block';
     this.disabled = true;
     this.textContent = 'Verified';
-    window.lastMatchVerified = true; // <-- Add this line here (likely line 604)
+    window.lastMatchVerified = true;
+    // Save to localStorage
+    const match = window.lastDecryptedMatch;
+    if (match && match.patient && match.donor && match.organ) {
+        const key = `${match.patient.id}_${match.donor.id}_${match.organ}`;
+        let verifiedMatches = JSON.parse(localStorage.getItem('verifiedMatches') || '[]');
+        if (!verifiedMatches.includes(key)) {
+            verifiedMatches.push(key);
+            localStorage.setItem('verifiedMatches', JSON.stringify(verifiedMatches));
+        }
+    }
 };
-
     </script>
     <script>
     document.getElementById('aiMatchesTable').parentElement.style.display = 'none';
